@@ -1,0 +1,48 @@
+html {
+  direction: rtl;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(
+    135deg,
+    $bg-gradient-start 0%,
+    $bg-gradient-end 40%
+  );
+}
+
+/* Cards */
+.card {
+  background-color: $bg-card;
+  border-radius: $border-radius-lg;
+  border: 1px solid $border-color;
+  padding: $space-4;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: $color-primary;
+  color: white;
+  border: none;
+  border-radius: $border-radius-md;
+  padding: 12px 16px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $color-primary-dark;
+  }
+}
+
+/* Status badges */
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  &.pending { background: rgba($status-pending, 0.15); color: $status-pending; }
+  &.preparing { background: rgba($status-preparing, 0.15); color: $status-preparing; }
+  &.ready { background: rgba($status-ready, 0.15); color: $status-ready; }
+  &.completed { background: rgba($status-completed, 0.15); color: $status-completed; }
+}
