@@ -111,9 +111,12 @@ Image Storage (Cloudinary or Local for MVP)
 ### Customer
 
 **Home / Menu**
-- View today’s menu
-- Meal cards with image
-- Select meals and quantity
+- View available meals (filtered by category)
+- Select Protein meal
+- Select Carb meal (after protein)
+- Repeat selection based on mealsPerDay
+- Optional Snack selection (if allowed by subscription)
+- Review daily macro targets (Protein / Carbs)
 
 **My Orders**
 - View current order
@@ -154,36 +157,53 @@ Meal
   _id,
   name,
   description,
-  price,
-  calories,
+  calories,        
   imageUrl,
   availability: 'daily' | 'weekly' | 'monthly',
+  category: 'protein' | 'carb' | 'snack',
   isActive,
   createdAt
 }
 
-Subscription
-{
+
+Subscription {
   _id,
   customerId,
   startDate,
   endDate,
   status: 'active' | 'paused',
+
+  plan: {
+  mealsPerDay: number,        // e.g. 1, 2, 3
+  includesSnack: boolean      // true | false
+}
+  },
+
+  macros: {
+    proteinGrams: number,
+    carbsGrams: number
+  },
+
   createdAt
 }
 
-Order
-{
+Order {
   _id,
   customerId,
-  meals: [
+  orderDate,
+  status: 'pending' | 'preparing' | 'ready' | 'completed',
+
+  macroTargets: { proteinGrams, carbsGrams }, 
+
+  selections: [
     {
-      mealId,
-      quantity
+      proteinMealId,
+      carbMealId
     }
   ],
-  status: 'pending' | 'preparing' | 'ready' | 'completed',
-  orderDate,
+
+  snackMealIds: [mealId],   
+  notes,
   createdAt
 }
 
@@ -196,74 +216,8 @@ Notification (MVP Internal)
   isRead,
   createdAt
 }
-8. API Contracts (Request / Response)
 
-8.1 Authentication
-
-POST /api/auth/login
-Request
-{
-  "identifier": "user@email.com",
-  "password": "password"
-}
-
-Response
-{
-  "accessToken": "JWT_TOKEN",
-  "user": {
-    "id": "...",
-    "role": "admin"
-  }
-}
-
-8.2 Meals
-
-GET /api/meals
-Response
-[
-  {
-    "id": "meal_1",
-    "name": "Healthy Chicken Meal",
-    "price": 35,
-    "calories": 520,
-    "availability": "daily"
-  }
-]
-
-POST /api/meals
-Request
-{
-  "name": "Salmon Meal",
-  "price": 45,
-  "calories": 600,
-  "availability": "daily"
-}
-8.3 Orders
-
-POST /api/orders
-Request
-{
-  "orderDate": "2025-12-23",
-  "items": [
-    { "mealId": "meal_1", "quantity": 1 }
-  ]
-}
-PATCH /api/orders/:id/status
-Request
-{
-  "status": "ready"
-}
-8.4 Subscriptions
-
-POST /api/subscriptions
-Request
-{
-  "customerId": "cus_1",
-  "startDate": "2025-12-23",
-  "endDate": "2026-01-23"
-}
-
-9. MVP Scope
+8. MVP Scope
 
 Included
 	•	Meals management
@@ -280,14 +234,14 @@ Not Included (Later Phase)
 
 ⸻
 
-10. Deployment
+9. Deployment
 	•	Frontend: Netlify / Vercel
 	•	Backend: Render / Railway
 	•	Database: MongoDB Atlas
 
 ⸻
 
-11. Final Notes
+10. Final Notes
 
 This PRD is designed to:
 	•	Be easy to understand

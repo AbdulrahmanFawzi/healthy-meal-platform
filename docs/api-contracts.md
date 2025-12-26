@@ -61,6 +61,7 @@ Returns meals list for both admin & customer.
 
 Query Params (optional)
 	•	availability=daily|weekly|monthly
+	•	category=protein|carb|snack
 	•	isActive=true|false
 	•	q=searchText
 
@@ -70,12 +71,12 @@ Response 200
   "data": [
     {
       "id": "meal_1",
-      "name": "Healthy Chicken Meal",
+      "name": "Grilled Chicken Meal",
       "description": "Grilled chicken with brown rice",
-      "price": 35,
       "calories": 520,
       "imageUrl": "https://res.cloudinary.com/.../meal.jpg",
       "availability": "daily",
+      "category": "protein",
       "isActive": true,
       "createdAt": "2025-12-23T08:12:00.000Z"
     }
@@ -88,11 +89,11 @@ Create a new meal.
 
 Request
 {
-  "name": "Salmon Meal",
-  "description": "Grilled salmon with vegetables",
-  "price": 45,
-  "calories": 600,
+  "name": "Grilled Chicken",
+  "description": "High-protein meal",
+  "calories": 520,
   "availability": "daily",
+  "category": "protein",
   "isActive": true
 }
 Response 201
@@ -100,7 +101,9 @@ Response 201
   "success": true,
   "data": {
     "id": "meal_2",
-    "name": "Salmon Meal",
+    "name": "Grilled Chicken",
+    "category": "protein",
+    "calories": 520,
     "imageUrl": null,
     "createdAt": "2025-12-23T09:00:00.000Z"
   }
@@ -123,8 +126,8 @@ Update a meal.
 
 Request (partial update allowed)
 {
-  "name": "Salmon Meal (Updated)",
-  "price": 49,
+  "name": "Grilled Chicken (Updated)",
+  "calories": 550,
   "isActive": true
 }
 Response 200
@@ -183,11 +186,19 @@ Request
   "customer": {
     "name": "Mohammed Ahmed",
     "phone": "+9665xxxxxxx",
-    "email": "m@email.com"
+    "email": "m@email.com",
+    "password": "Temp@1234"
   },
-  "plan": "monthly",
-  "startDate": "2025-12-23",
-  "endDate": "2026-01-23",
+  "plan": {
+    "mealsPerDay": 2,
+    "includesSnack": true
+  },
+  "macros": {
+    "proteinGrams": 150,
+    "carbsGrams": 150
+  },
+  "startDate": "2025-12-26",
+  "endDate": "2026-01-26",
   "status": "active"
 }
 Response 201
@@ -224,26 +235,14 @@ Response 200
         "phone": "+9665xxxxxxx",
         "email": "m@email.com"
       },
-      "plan": "monthly",
-      "startDate": "2025-12-23",
-      "endDate": "2026-01-23",
-      "status": "active",
-      "createdAt": "2025-12-23T09:30:00.000Z"
-    }
-  ]
-}
-{
-  "success": true,
-  "data": [
-    {
-      "id": "sub_1",
-      "customer": {
-        "id": "cus_1",
-        "name": "Mohammed Ahmed",
-        "phone": "+9665xxxxxxx",
-        "email": "m@email.com"
+      "plan": {
+        "mealsPerDay": 2,
+        "includesSnack": true
       },
-      "plan": "monthly",
+      "macros": {
+        "proteinGrams": 150,
+        "carbsGrams": 150
+      },
       "startDate": "2025-12-23",
       "endDate": "2026-01-23",
       "status": "active",
@@ -280,11 +279,12 @@ Create a daily order.
 
 Request
 {
-  "orderDate": "2025-12-23",
-  "items": [
-    { "mealId": "meal_1", "quantity": 1 },
-    { "mealId": "meal_3", "quantity": 2 }
+  "orderDate": "2025-12-26",
+  "selections": [
+    { "proteinMealId": "meal_p1", "carbMealId": "meal_c2" },
+    { "proteinMealId": "meal_p3", "carbMealId": "meal_c1" }
   ],
+  "snackMealIds": ["meal_s1"],
   "notes": "No sauce"
 }
 Response 201
@@ -320,7 +320,7 @@ Response 200
 {
   "success": true,
   "data": {
-    "date": "2025-12-23",
+    "date": "2025-12-26",
     "orders": [
       {
         "id": "ord_1",
@@ -329,19 +329,56 @@ Response 200
           "name": "Mohammed Ahmed",
           "phone": "+9665xxxxxxx"
         },
-        "items": [
+        "macroTargets": {
+          "proteinGrams": 150,
+          "carbsGrams": 150
+        },
+        "selections": [
           {
-            "meal": {
-              "id": "meal_1",
-              "name": "Healthy Chicken Meal",
+            "proteinMeal": {
+              "id": "meal_p1",
+              "name": "Grilled Chicken",
+              "category": "protein",
+              "calories": 250,
               "imageUrl": "https://..."
             },
-            "quantity": 1
+            "carbMeal": {
+              "id": "meal_c1",
+              "name": "Brown Rice",
+              "category": "carb",
+              "calories": 200,
+              "imageUrl": "https://..."
+            }
+          },
+          {
+            "proteinMeal": {
+              "id": "meal_p2",
+              "name": "Grilled Salmon",
+              "category": "protein",
+              "calories": 280,
+              "imageUrl": "https://..."
+            },
+            "carbMeal": {
+              "id": "meal_c2",
+              "name": "Sweet Potato",
+              "category": "carb",
+              "calories": 180,
+              "imageUrl": "https://..."
+            }
+          }
+        ],
+        "snacks": [
+          {
+            "id": "meal_s1",
+            "name": "Mixed Nuts",
+            "category": "snack",
+            "calories": 150,
+            "imageUrl": "https://..."
           }
         ],
         "status": "preparing",
         "notes": "No sauce",
-        "createdAt": "2025-12-23T09:10:00.000Z"
+        "createdAt": "2025-12-26T09:10:00.000Z"
       }
     ]
   }
@@ -365,12 +402,25 @@ Response 200
   "data": [
     {
       "id": "ord_1",
-      "orderDate": "2025-12-23",
+      "orderDate": "2025-12-26",
       "status": "ready",
-      "items": [
-        { "mealId": "meal_1", "quantity": 1 }
+      "macroTargets": {
+        "proteinGrams": 150,
+        "carbsGrams": 150
+      },
+      "selections": [
+        {
+          "proteinMealId": "meal_p1",
+          "carbMealId": "meal_c1"
+        },
+        {
+          "proteinMealId": "meal_p2",
+          "carbMealId": "meal_c2"
+        }
       ],
-      "createdAt": "2025-12-23T09:10:00.000Z"
+      "snackMealIds": ["meal_s1"],
+      "notes": "No sauce",
+      "createdAt": "2025-12-26T09:10:00.000Z"
     }
   ]
 }

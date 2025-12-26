@@ -48,9 +48,20 @@ MOST USERS WILL USE MOBILE PHONES.
 
 ### 5) Domain Enums (Use exact values)
 - `MealAvailability`: `daily` | `weekly` | `monthly`
+- `MealCategory`: `protein` | `carb` | `snack`
 - `OrderStatus`: `pending` | `preparing` | `ready` | `completed`
 - `SubscriptionStatus`: `active` | `paused`
 - Notification type (MVP): `READY_FOR_PICKUP`
+
+### 5a) Key Business Rules (MVP)
+- Meals have NO price field (removed)
+- Meals are categorized by `category` field
+- Subscriptions use flexible plan structure (no fixed plan codes)
+- Orders contain paired selections: { proteinMealId, carbMealId }
+- Number of selections MUST equal subscription.plan.mealsPerDay
+- Snacks are optional: max 1 snack per day (snackMealIds = [] or [oneId])
+- Macros (proteinGrams, carbsGrams) are DAILY targets (informational only, no validation)
+- Subscription status = 'active' required to create orders
 
 ### 6) API Conventions
 - Base path: `/api`
@@ -98,9 +109,9 @@ Notifications (recommended for mobile UX):
 
 8) Data Models (High Level)
 	•	User: name, phone, email, role
-	•	Meal: name, description, price, calories, imageUrl, availability, isActive
-	•	Subscription: customerId, startDate, endDate, status
-	•	Order: customerId, items[{mealId, quantity}], status, orderDate, notes
+	•	Meal: name, description, calories, imageUrl, availability, category, isActive
+	•	Subscription: customerId, startDate, endDate, status, plan (mealsPerDay, includesSnack), macros (proteinGrams, carbsGrams - daily targets)
+	•	Order: customerId, orderDate, status, macroTargets (snapshot), selections[{proteinMealId, carbMealId}], snackMealIds[], notes
 	•	Notification: customerId, orderId, message, isRead, createdAt
 
 9) Frontend Structure Expectations (Angular)
