@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const connectDB = require('./config/db');
 const apiRoutes = require('./routes/index');
 const { errorHandler, notFoundHandler } = require('./middlewares/error.middleware');
 
@@ -58,16 +59,29 @@ app.use(errorHandler);
 // ===========================
 // Start Server
 // ===========================
+const startServer = async () => {
+  try {
+    // Connect to MongoDB first
+    await connectDB();
+    
+    // Start Express server after successful DB connection
+    app.listen(PORT, () => {
+      console.log('');
+      console.log('🚀 Healthy Meal Platform - Backend API');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log(`📡 Server running on port: ${PORT}`);
+      console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`✅ Health check: http://localhost:${PORT}/api/health`);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('');
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error.message);
+    process.exit(1); // Exit with failure code
+  }
+};
 
-app.listen(PORT, () => {
-  console.log('');
-  console.log('🚀 Healthy Meal Platform - Backend API');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log(`📡 Server running on port: ${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`✅ Health check: http://localhost:${PORT}/api/health`);
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('');
-});
+// Start the server
+startServer();
 
 module.exports = app;
