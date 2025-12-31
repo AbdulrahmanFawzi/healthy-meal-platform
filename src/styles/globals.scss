@@ -1,4 +1,5 @@
 @use 'variables' as *;
+@use 'sass:color';
 
 html {
   direction: rtl;
@@ -43,8 +44,8 @@ body {
   font-size: 0.75rem;
   font-weight: 600;
 
-  &.pending { background: rgba($status-pending, 0.15); color: $status-pending; }
-  &.preparing { background: rgba($status-preparing, 0.15); color: $status-preparing; }
-  &.ready { background: rgba($status-ready, 0.15); color: $status-ready; }
-  &.completed { background: rgba($status-completed, 0.15); color: $status-completed; }
+  &.pending { background: color.change($status-pending, $alpha: 0.15); color: $status-pending; }
+  &.preparing { background: color.change($status-preparing, $alpha: 0.15); color: $status-preparing; }
+  &.ready { background: color.change($status-ready, $alpha: 0.15); color: $status-ready; }
+  &.completed { background: color.change($status-completed, $alpha: 0.15); color: $status-completed; }
 }

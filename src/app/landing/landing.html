@@ -1,0 +1,85 @@
+<div class="landing-page" dir="rtl">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <!-- Icon Container -->
+      <div class="icon-container">
+        <svg class="icon" width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Fork -->
+          <path d="M9 3v6.5c0 .83-.67 1.5-1.5 1.5S6 10.33 6 9.5V3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M9 3v6.5c0 .83.67 1.5 1.5 1.5S12 10.33 12 9.5V3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M10.5 11v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          
+          <!-- Knife -->
+          <path d="M16 3v8c0 1.1-.9 2-2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M14 13v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <!-- Main Title -->
+      <h1 class="hero-title">
+        مرحبًا بك في <span class="highlight">وجباتي</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="hero-subtitle">
+        خدمة الاشتراك في الوجبات الصحية. ودّع الفوضى في طلبات الواتساب ومرحباً بنظام الطلبات المنظم والمهيكل
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="cta-buttons">
+        <button class="btn btn-primary" type="button">
+          دخول العميل
+        </button>
+        <button class="btn btn-outline" type="button">
+          دخول صاحب المطعم
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="features-container">
+      @for (feature of features; track feature.icon) {
+        <div class="feature-card">
+          <div class="icon-container">
+            <img [src]="feature.icon" [alt]="feature.title" class="feature-icon">
+          </div>
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-description">{{ feature.description }}</p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works-section">
+    <div class="how-it-works-card">
+      <h2 class="how-it-works-title">كيف يعمل النظام</h2>
+      <p class="how-it-works-description">
+        وجباتي تبسط تجربة الاشتراك في الوجبات من خلال منصة رقمية حديثة تستبدل رسائل الواتساب المربكة بنظام نظيف ومنظم لأصحاب المطاعم والمشتركين
+      </p>
+      
+      <div class="steps-container">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3 class="step-title">تصفح القائمة</h3>
+          <p class="step-description">شاهد خيارات الوجبات الطازجة اليوم مع معلومات غذائية تفصيلية</p>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3 class="step-title">تقديم الطلب</h3>
+          <p class="step-description">اختر وجباتك وقدم طلبك في ثوانٍ معدودة</p>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3 class="step-title">تتبع واستلام</h3>
+          <p class="step-description">احصل على تحديثات فورية واستلم طلبك عند الجاهزية</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

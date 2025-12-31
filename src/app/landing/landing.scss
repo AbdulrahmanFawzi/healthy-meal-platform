@@ -1,0 +1,387 @@
+@use '../../styles/variables' as *;
+@use 'sass:color';
+
+.landing-page {
+  min-height: 100vh;
+  background-color: #FFFFFF;
+}
+
+.hero {
+  display: flex;
+  justify-content: center;
+  padding: $space-6 $space-4;
+  padding-top: 80px;
+}
+
+.hero-content {
+  max-width: 560px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: $space-3;
+
+  // Icon Container - Rounded square with shadow
+  .icon-container {
+    width: 64px;
+    height: 64px;
+    border-radius: $border-radius-md; // Rounded square instead of circle
+    background-color: $color-primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: $space-2;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12); // Soft shadow
+
+    .icon {
+      width: 28px;
+      height: 28px;
+      color: white;
+    }
+  }
+}
+
+// Main Title
+.hero-title {
+  margin: 0;
+  font-family: $font-family-base; // Cairo
+  font-size: 36px; // Exact Figma size for mobile
+  font-weight: 800; // ExtraBold
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: $text-primary;
+  max-width: 90%;
+
+  .highlight {
+    color: $color-primary;
+    font-weight: 800; // Same weight as parent
+  }
+}
+
+// Subtitle
+.hero-subtitle {
+  margin: 0;
+  font-family: $font-family-base; // Cairo
+  font-size: 18px; // Exact Figma size
+  font-weight: 400; // Regular
+  line-height: 1.7;
+  letter-spacing: 0;
+  color: $text-muted;
+  max-width: 90%;
+  text-align: center;
+}
+
+// CTA Buttons
+.cta-buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: $space-3;
+  width: 100%;
+  margin-top: $space-2;
+  justify-content: center;
+}
+
+.btn {
+  flex: 1 1 auto;
+  min-width: 150px;
+  max-width: 200px;
+  padding: 11px $space-4;
+  border-radius: $border-radius-md;
+  font-family: $font-family-base; // Cairo
+  font-size: 18px; // Exact Figma size
+  font-weight: 600; // SemiBold
+  line-height: 28px; // Exact Figma line-height
+  letter-spacing: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.btn-primary {
+  background-color: $color-primary;
+  color: white;
+  border-color: $color-primary;
+  box-shadow: 0 2px 8px color.change($color-primary, $alpha: 0.2); // Subtle shadow
+
+  &:hover {
+    background-color: $color-primary-dark;
+    border-color: $color-primary-dark;
+    box-shadow: 0 4px 12px color.change($color-primary, $alpha: 0.25);
+  }
+}
+
+.btn-outline {
+  background-color: $bg-card; // White background
+  color: $text-secondary; // Dark/muted text instead of bright green
+  border-color: $border-color; // Light neutral border
+
+  &:hover {
+    background-color: $bg-page;
+    border-color: color.adjust($border-color, $lightness: -5%);
+  }
+}
+
+// Small screens - allow button wrapping
+@media (max-width: 419px) {
+  .cta-buttons {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $space-3;
+  }
+
+  .btn {
+    width: 100%;
+    min-width: unset;
+    max-width: unset;
+  }
+}
+
+// Tablet & Desktop
+@media (min-width: 768px) {
+  .hero-content {
+    gap: $space-4;
+  }
+
+  .hero-title {
+    font-size: 48px; // Exact Figma size for desktop
+    max-width: 600px;
+  }
+
+  .hero-subtitle {
+    font-size: 18px; // Consistent 18px on all screens
+    max-width: 640px;
+  }
+
+  .icon-container {
+    width: 72px;
+    height: 72px;
+
+    .icon {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .cta-buttons {
+    margin-top: $space-3;
+    max-width: 480px;
+    gap: $space-4;
+  }
+
+  .btn {
+    min-width: 170px;
+    max-width: 220px;
+    padding: 11px $space-5;
+  }
+}
+
+// Features Section
+.features-section {
+  padding: 64px 24px;
+  background-color: #FFFFFF;
+}
+
+.features-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  
+  // Mobile responsive
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feature-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  direction: rtl;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.12);
+  }
+
+  .icon-container {
+    width: 48px;
+    height: 48px;
+    background-color: #F0FDF4;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: none;
+    align-self: flex-start;
+    margin-inline-end: auto;
+  }
+
+  .feature-icon {
+    width: 24px;
+    height: 24px;
+    color: #00A63E;
+  }
+}
+
+.feature-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  text-align: right;
+  order: 1; // Text appears on the left in RTL
+}
+
+.feature-title {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 28px;
+  letter-spacing: 0px;
+  color: #101828;
+  margin: 0;
+  text-align: right;
+  width: 100%;
+  margin-top: -8px;
+}
+
+.feature-description {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0px;
+  color: #4A5565;
+  margin: 0;
+  white-space: pre-line;
+  text-align: right;
+  width: 100%;
+}
+
+// How It Works Section
+.how-it-works-section {
+  padding: 64px 24px;
+  background-color: #FFFFFF;
+}
+
+.how-it-works-card {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 24px;
+  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.08);
+  padding: 48px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  
+  @media (max-width: 1024px) {
+    max-width: 900px;
+    padding: 40px 48px;
+    gap: 28px;
+  }
+  
+  @media (max-width: 640px) {
+    max-width: calc(100% - 32px);
+    padding: 32px 24px;
+    gap: 24px;
+  }
+}
+
+.how-it-works-title {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 36px;
+  letter-spacing: 0px;
+  color: #101828;
+  margin: 0;
+  text-align: center;
+}
+
+.how-it-works-description {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0px;
+  color: #4A5565;
+  margin: 0;
+  text-align: center;
+  max-width: 800px;
+  margin-inline: auto;
+}
+
+.steps-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  margin-top: 8px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.step-number {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  color: #00A63E;
+  margin: 0;
+}
+
+.step-title {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0px;
+  color: #101828;
+  margin: 0;
+}
+
+.step-description {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: 0px;
+  color: #4A5565;
+  margin: 0;
+}
