@@ -1,0 +1,39 @@
+<!-- Admin Dashboard Container - RTL Arabic layout -->
+<!-- Access: Protected by authGuard and roleGuard (role: 'admin') -->
+<div class="admin-container" dir="rtl">
+  
+  <!-- Admin Header - Shows restaurant branding and user info -->
+  <header class="admin-header">
+    <div class="header-content">
+      
+      <!-- Restaurant Logo and Info Section -->
+      <div class="logo-section">
+        <!-- Restaurant Logo Placeholder - Will display restaurant.logoUrl -->
+        <div class="restaurant-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+          </svg>
+        </div>
+        <!-- Restaurant Name and Role Label -->
+        <div class="restaurant-info">
+          <h1 class="restaurant-name">{{ restaurantName }}</h1>
+          <p class="user-role">لوحة تحكم المشرف</p>
+        </div>
+      </div>
+      
+      <!-- User Information Section -->
+      <div class="user-section">
+        <span class="user-name">{{ userName }}</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="admin-main">
+    <!-- Placeholder Welcome Card - Will be replaced with actual admin features -->
+    <div class="welcome-card">
+      <h2>مرحباً بك في لوحة التحكم</h2>
+      <p>سيتم إضافة المميزات قريباً</p>
+    </div>
+  </main>
+</div>

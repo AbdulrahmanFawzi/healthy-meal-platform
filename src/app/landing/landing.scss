@@ -22,22 +22,17 @@
   text-align: center;
   gap: $space-3;
 
-  // Icon Container - Rounded square with shadow
+  // Icon Container - No background, just icon with shadow
   .icon-container {
-    width: 64px;
-    height: 64px;
-    border-radius: $border-radius-md; // Rounded square instead of circle
-    background-color: $color-primary;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: $space-2;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12); // Soft shadow
 
     .icon {
-      width: 28px;
-      height: 28px;
-      color: white;
+      width: 120px;
+      height: 120px;
+      filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.25)); // Enhanced shadow
     }
   }
 }
@@ -77,31 +72,36 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: $space-3;
+  gap: 8px;
   width: 100%;
   margin-top: $space-2;
   justify-content: center;
 }
 
 .btn {
-  flex: 1 1 auto;
-  min-width: 150px;
-  max-width: 200px;
-  padding: 11px $space-4;
-  border-radius: $border-radius-md;
-  font-family: $font-family-base; // Cairo
-  font-size: 18px; // Exact Figma size
-  font-weight: 600; // SemiBold
-  line-height: 28px; // Exact Figma line-height
+  height: 48px;
+  padding: 0 32px;
+  border-radius: 8px;
+  font-family: $font-family-base;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 28px;
   letter-spacing: 0;
+  text-align: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 44px;
-  border: 1px solid transparent;
+  border: none;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  text-decoration: none !important;
+
+  &:hover,
+  &:focus,
+  &:active {
+    text-decoration: none !important;
+  }
 
   &:active {
     transform: scale(0.98);
@@ -109,22 +109,19 @@
 }
 
 .btn-primary {
-  background-color: $color-primary;
-  color: white;
-  border-color: $color-primary;
-  box-shadow: 0 2px 8px color.change($color-primary, $alpha: 0.2); // Subtle shadow
+  background-color: #00A63E;
+  color: #FFFFFF;
+  border: none;
 
   &:hover {
     background-color: $color-primary-dark;
-    border-color: $color-primary-dark;
-    box-shadow: 0 4px 12px color.change($color-primary, $alpha: 0.25);
   }
 }
 
 .btn-outline {
-  background-color: $bg-card; // White background
-  color: $text-secondary; // Dark/muted text instead of bright green
-  border-color: $border-color; // Light neutral border
+  background-color: $bg-card;
+  color: $text-secondary;
+  border: 1px solid $border-color;
 
   &:hover {
     background-color: $bg-page;
@@ -175,14 +172,15 @@
 
   .cta-buttons {
     margin-top: $space-3;
-    max-width: 480px;
-    gap: $space-4;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    width: 161.31px;
   }
 
   .btn {
-    min-width: 170px;
-    max-width: 220px;
-    padding: 11px $space-5;
+    padding: 0 32px;
   }
 }
 

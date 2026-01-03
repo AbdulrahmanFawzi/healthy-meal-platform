@@ -20,21 +20,45 @@ router.get('/health', (req, res) => {
 });
 
 // ===========================
+// API Routes
+// ===========================
+
+/**
+ * Authentication Routes
+ * ---------------------
+ * Handles user login, logout, and profile retrieval.
+ * Base path: /api/auth
+ * 
+ * Available endpoints:
+ * - POST /api/auth/login
+ * - GET /api/auth/me
+ * - POST /api/auth/logout
+ */
+const authRoutes = require('../modules/auth/auth.routes');
+router.use('/auth', authRoutes);
+
+// ===========================
 // Future API Routes
 // ===========================
-// TODO: Mount authentication routes
-// router.use('/auth', require('./auth.routes'));
 
-// TODO: Mount meals routes
-// router.use('/meals', require('./meals.routes'));
+// TODO: Mount meals routes (restaurant-scoped)
+// const mealsRoutes = require('../modules/meals/meals.routes');
+// router.use('/meals', mealsRoutes);
 
-// TODO: Mount orders routes
-// router.use('/orders', require('./orders.routes'));
+// TODO: Mount orders routes (restaurant-scoped)
+// const ordersRoutes = require('../modules/orders/orders.routes');
+// router.use('/orders', ordersRoutes);
 
-// TODO: Mount subscriptions routes
-// router.use('/subscriptions', require('./subscriptions.routes'));
+// TODO: Mount subscriptions routes (restaurant-scoped)
+// const subscriptionsRoutes = require('../modules/subscriptions/subscriptions.routes');
+// router.use('/subscriptions', subscriptionsRoutes);
 
-// TODO: Mount notifications routes
-// router.use('/notifications', require('./notifications.routes'));
+// TODO: Mount notifications routes (restaurant-scoped)
+// const notificationsRoutes = require('../modules/notifications/notifications.routes');
+// router.use('/notifications', notificationsRoutes);
+
+// TODO: Mount platform routes (super_admin only)
+// const platformRoutes = require('../modules/platform/platform.routes');
+// router.use('/platform', platformRoutes);
 
 module.exports = router;
