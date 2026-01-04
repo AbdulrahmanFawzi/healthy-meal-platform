@@ -1,0 +1,144 @@
+@use 'sass:color';
+@use '../../../styles/variables.scss' as *;
+
+.admin-sidebar {
+  width: 280px;
+  background: $bg-card;
+  border-left: 1px solid $border-color;
+  height: 100vh;
+  position: fixed;
+  right: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  overflow-y: auto;
+  z-index: 50;
+}
+
+.sidebar-logo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0px;
+  padding: 0 16px 10px;
+  border-bottom: 1px solid $border-color;
+  margin-bottom: 8px;
+}
+
+.logo-image {
+  width: 70px !important;
+  height: 70px !important;
+  border-radius: 12px;
+  object-fit: contain;
+}
+
+.brand-text {
+  font-family: $font-family-base;
+  font-weight: 700;
+  font-size: 18px;
+  color: $text-primary;
+  margin: 0;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 12px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: $border-radius-sm;
+  text-decoration: none;
+  color: $text-secondary;
+  font-family: $font-family-base;
+  font-weight: 500;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: #F3F4F6;
+    color: $text-primary;
+  }
+
+  &.active {
+    background: $color-primary-light;
+    color: $color-primary;
+    font-weight: 600;
+
+    .nav-icon {
+      opacity: 1;
+    }
+  }
+}
+
+.nav-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.nav-label {
+  flex: 1;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 32px 24px 20px;
+  border-top: 1px solid $border-color;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  font-family: $font-family-base;
+  font-weight: 500;
+  font-size: 16px;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #EF4444;
+
+    svg {
+      stroke: #EF4444;
+    }
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    transition: stroke 0.2s ease;
+  }
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+  .admin-sidebar {
+    width: 240px;
+  }
+
+  .brand-text {
+    font-size: 16px;
+  }
+
+  .nav-item {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+}

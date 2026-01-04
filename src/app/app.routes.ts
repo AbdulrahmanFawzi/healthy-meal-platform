@@ -15,7 +15,30 @@ export const routes: Routes = [
     path: 'admin',
     loadComponent: () => import('./admin/admin-layout/admin-layout').then(m => m.AdminLayoutComponent),
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['admin'] }
+    data: { roles: ['admin'] },
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./admin/dashboard/dashboard').then(m => m.AdminDashboardComponent)
+      },
+      {
+        path: 'menu-management',
+        loadComponent: () => import('./admin/menu-management/menu-management').then(m => m.AdminMenuManagementComponent)
+      },
+      {
+        path: 'orders',
+        loadComponent: () => import('./admin/orders/orders').then(m => m.AdminOrdersComponent)
+      },
+      {
+        path: 'subscriptions',
+        loadComponent: () => import('./admin/subscriptions/subscriptions').then(m => m.AdminSubscriptionsComponent)
+      }
+    ]
   },
   {
     path: 'customer',

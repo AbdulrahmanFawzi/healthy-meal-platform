@@ -26,7 +26,7 @@ export class LoginComponent {
     this.loginForm = this.fb.group({
       phone: ['', [
         Validators.required,
-        Validators.pattern(/^\+96605\d{8}$/)  // Saudi phone: +966 5XXXXXXXX
+        Validators.pattern(/^\+9665\d{8}$/)  // Saudi phone: +966 5XXXXXXXX
       ]],
       password: ['', [
         Validators.required,
