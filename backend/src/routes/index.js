@@ -37,13 +37,25 @@ router.get('/health', (req, res) => {
 const authRoutes = require('../modules/auth/auth.routes');
 router.use('/auth', authRoutes);
 
+/**
+ * Meals Routes
+ * ------------
+ * Handles meal management (CRUD + image upload).
+ * Base path: /api/meals
+ * 
+ * Available endpoints:
+ * - GET /api/meals (admin, customer)
+ * - POST /api/meals (admin only)
+ * - PUT /api/meals/:id (admin only)
+ * - DELETE /api/meals/:id (admin only)
+ * - POST /api/meals/:id/image (admin only)
+ */
+const mealRoutes = require('../modules/meals/meal.routes');
+router.use('/meals', mealRoutes);
+
 // ===========================
 // Future API Routes
 // ===========================
-
-// TODO: Mount meals routes (restaurant-scoped)
-// const mealsRoutes = require('../modules/meals/meals.routes');
-// router.use('/meals', mealsRoutes);
 
 // TODO: Mount orders routes (restaurant-scoped)
 // const ordersRoutes = require('../modules/orders/orders.routes');

@@ -1,0 +1,12 @@
+<!-- Placeholder SVG for meals without images -->
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#F3F4F6"/>
+  <g opacity="0.3">
+    <circle cx="200" cy="120" r="40" fill="#D1D5DB"/>
+    <path d="M200 140C200 140 180 160 180 180C180 191.046 189.954 200 200 200C210.046 200 220 191.046 220 180C220 160 200 140 200 140Z" fill="#D1D5DB"/>
+    <ellipse cx="200" cy="210" rx="60" ry="15" fill="#D1D5DB"/>
+  </g>
+  <text x="200" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#9CA3AF">
+    لا توجد صورة
+  </text>
+</svg>

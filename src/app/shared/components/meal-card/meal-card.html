@@ -1,0 +1,102 @@
+<!-- 
+  Meal Card Template
+  
+  Displays meal info in a card format
+  Matches Figma design with badge, image, stats, and actions
+-->
+
+<div class="meal-card">
+  
+  <!-- Card Image with Badge -->
+  <div class="card-image-container">
+    <img 
+      [src]="imageUrl" 
+      [alt]="meal.name"
+      class="card-image"
+      (error)="$event.target.src='assets/images/meal-placeholder.svg'"
+    />
+    
+    <!-- Category Badge (Top-Right) -->
+    <span 
+      class="category-badge"
+      [style.color]="categoryConfig.color"
+      [style.backgroundColor]="categoryConfig.backgroundColor"
+    >
+      {{ categoryConfig.label }}
+    </span>
+  </div>
+
+  <!-- Card Content -->
+  <div class="card-content">
+    
+    <!-- Meal Name -->
+    <h3 class="meal-name">{{ meal.name }}</h3>
+    
+    <!-- Meal Description -->
+    <p class="meal-description">{{ meal.description }}</p>
+    
+    <!-- Nutrition Stats -->
+    <div class="nutrition-stats">
+      <div class="stat">
+        <span class="stat-value">{{ meal.calories }}</span>
+        <span class="stat-label">سعرة</span>
+      </div>
+      <div class="stat-divider">•</div>
+      <div class="stat">
+        <span class="stat-value">{{ meal.proteinGrams }}جـ</span>
+        <span class="stat-label">بروتين</span>
+      </div>
+      <div class="stat-divider">•</div>
+      <div class="stat">
+        <span class="stat-value">{{ meal.carbsGrams }}جـ</span>
+        <span class="stat-label">كارب</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Card Actions -->
+  <div class="card-actions">
+    
+    <!-- Delete Button -->
+    <button 
+      type="button"
+      class="action-btn delete-btn"
+      (click)="onDelete()"
+      title="حذف الوجبة"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M19 7L18.1327 19.1425C18.0579 20.1891 17.187 21 16.1378 21H7.86224C6.81296 21 5.94208 20.1891 5.86732 19.1425L5 7M10 11V17M14 11V17M15 7V4C15 3.44772 14.5523 3 14 3H10C9.44772 3 9 3.44772 9 4V7M4 7H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <!-- Edit Button -->
+    <button 
+      type="button"
+      class="action-btn edit-btn"
+      (click)="onEdit()"
+      title="تعديل الوجبة"
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M18.5 2.50023C18.8978 2.1024 19.4374 1.87891 20 1.87891C20.5626 1.87891 21.1022 2.1024 21.5 2.50023C21.8978 2.89805 22.1213 3.43762 22.1213 4.00023C22.1213 4.56284 21.8978 5.1024 21.5 5.50023L12 15.0002L8 16.0002L9 12.0002L18.5 2.50023Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>تعديل</span>
+    </button>
+
+    <!-- Active Toggle Switch -->
+    <div class="toggle-container">
+      <label class="toggle-switch">
+        <input 
+          type="checkbox" 
+          [checked]="meal.isActive"
+          (change)="onToggleActive($event)"
+        />
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="toggle-label">نشط</span>
+    </div>
+
+  </div>
+
+</div>

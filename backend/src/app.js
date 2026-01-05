@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const connectDB = require('./config/db');
 const apiRoutes = require('./routes/index');
 const { errorHandler, notFoundHandler } = require('./middlewares/error.middleware');
@@ -23,6 +24,10 @@ app.use(express.json());
 
 // Parse URL-encoded request bodies
 app.use(express.urlencoded({ extended: true }));
+
+// Serve uploaded images statically
+// Images accessible at: http://localhost:4000/uploads/filename.jpg
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Request logging (simple console log for development)
 app.use((req, res, next) => {

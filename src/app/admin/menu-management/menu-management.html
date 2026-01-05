@@ -1,4 +1,105 @@
+<!-- 
+  Menu Management Page
+  
+  Admin interface for managing restaurant meals
+  Matches Figma design with header, button, and meal grid
+-->
+
 <div class="page-container" dir="rtl">
-  <h1 class="page-title">إدارة القائمة</h1>
-  <p class="page-subtitle">إدارة الوجبات والأصناف المتاحة</p>
+  
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">إدارة القائمة</h1>
+      <p class="page-subtitle">إضافة وتعديل الوجبات المتاحة</p>
+    </div>
+    
+    <!-- Add Meal Button (LEFT side in RTL) -->
+    <button 
+      type="button" 
+      class="add-meal-btn"
+      (click)="openAddMealModal()"
+    >
+      <span class="btn-icon">+</span>
+      <span class="btn-text">إضافة وجبة جديدة</span>
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  @if (isInitialLoading) {
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">جاري تحميل الوجبات...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error && !isInitialLoading) {
+    <div class="error-container">
+      <p class="error-message">{{ error }}</p>
+      <button 
+        type="button" 
+        class="retry-btn"
+        (click)="loadMeals()"
+      >
+        إعادة المحاولة
+      </button>
+    </div>
+  }
+
+  <!-- Meals Grid -->
+  @if (!isInitialLoading && !error) {
+    @if (meals.length > 0) {
+      <div class="meals-grid">
+        @for (meal of meals; track meal._id) {
+          <app-meal-card
+            [meal]="meal"
+            (edit)="onEditMeal($event)"
+            (delete)="onDeleteMeal($event)"
+            (toggleActive)="onToggleMealStatus($event)"
+          ></app-meal-card>
+        }
+      </div>
+    } @else {
+      <!-- Empty State -->
+      <div class="empty-state">
+        <svg class="empty-icon" width="64" height="64" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="#D1D5DB"/>
+        </svg>
+        <h3 class="empty-title">لا توجد وجبات بعد</h3>
+        <p class="empty-text">ابدأ بإضافة وجبة جديدة لقائمة مطعمك</p>
+        <button 
+          type="button" 
+          class="add-first-meal-btn"
+          (click)="openAddMealModal()"
+        >
+          + إضافة أول وجبة
+        </button>
+      </div>
+    }
+  }
+
+  <!-- Meal Form Modal -->
+  <app-meal-form-modal
+    [isOpen]="isModalOpen"
+    [meal]="editingMeal"
+    (close)="closeModal()"
+    (submit)="onMealSubmit($event)"
+  ></app-meal-form-modal>
+
+  <!-- Confirmation Modal -->
+  <app-confirmation-modal
+    [isOpen]="isConfirmationOpen"
+    [title]="'تأكيد الحذف'"
+    [message]="'هل أنت متأكد من حذف هذه الوجبة؟ لا يمكن التراجع عن هذا الإجراء.'"
+    [confirmText]="'حذف'"
+    [cancelText]="'إلغاء'"
+    [type]="'danger'"
+    (confirm)="confirmDelete()"
+    (cancel)="cancelDelete()"
+  ></app-confirmation-modal>
+
+  <!-- Loading Overlay -->
+  <app-loading-overlay [isLoading]="isLoading" message="جاري حفظ البيانات..."></app-loading-overlay>
+
 </div>

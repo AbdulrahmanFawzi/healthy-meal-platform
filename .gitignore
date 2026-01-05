@@ -40,3 +40,7 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Backend uploads (keep directory structure)
+backend/uploads/*
+!backend/uploads/.gitkeep

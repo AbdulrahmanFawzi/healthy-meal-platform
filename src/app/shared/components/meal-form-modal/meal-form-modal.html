@@ -1,0 +1,264 @@
+<!-- 
+  Meal Form Modal Template
+  
+  Responsive modal for adding/editing meals
+  Full-screen on mobile, centered popup on desktop
+-->
+
+<!-- Modal Backdrop -->
+@if (isOpen) {
+  <div class="modal-backdrop" (click)="onClose()"></div>
+  
+  <!-- Modal Container -->
+  <div class="modal-container" [class.open]="isOpen">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h2 class="modal-title">
+          {{ meal ? 'تعديل الوجبة' : 'إضافة وجبة جديدة' }}
+        </h2>
+        <button 
+          type="button" 
+          class="close-btn" 
+          (click)="onClose()"
+          [disabled]="isSubmitting"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <form [formGroup]="mealForm" (ngSubmit)="onSubmit(); $event.preventDefault()" class="modal-body" autocomplete="off" (click)="closeAllDropdowns()">
+        
+        <!-- Image Upload Section -->
+        <div class="form-section">
+          <label class="section-label">صورة الوجبة</label>
+          
+          <div 
+            class="image-upload-area" 
+            (click)="triggerImageUpload()"
+            [class.has-image]="imagePreview"
+          >
+            @if (imagePreview) {
+              <!-- Image Preview -->
+              <div class="image-preview">
+                <img [src]="imagePreview" alt="معاينة الصورة" />
+                <button 
+                  type="button" 
+                  class="remove-image-btn" 
+                  (click)="removeImage(); $event.stopPropagation()"
+                >
+                  ✕
+                </button>
+              </div>
+            } @else {
+              <!-- Upload Placeholder -->
+              <div class="upload-placeholder">
+                <svg class="upload-icon" width="48" height="48" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 4L12 16M12 4L8 8M12 4L16 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M4 17V19C4 19.5304 4.21071 20.0391 4.58579 20.4142C4.96086 20.7893 5.46957 21 6 21H18C18.5304 21 19.0391 20.7893 19.4142 20.4142C19.7893 20.0391 20 19.5304 20 19V17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <p class="upload-text">انقر لتحميل صورة</p>
+              </div>
+            }
+          </div>
+          
+          <!-- Hidden File Input -->
+          <input 
+            type="file" 
+            id="mealImageInput" 
+            accept="image/*"
+            (change)="onImageSelected($event)"
+            style="display: none;"
+          />
+        </div>
+
+        <!-- Meal Name -->
+        <div class="form-group">
+          <label for="mealName" class="form-label">
+            اسم الوجبة <span class="required">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="mealName"
+            class="form-input" 
+            placeholder="مثال: صدر دجاج مشوي"
+            formControlName="name"
+            [class.error]="hasError('name')"
+          />
+          @if (hasError('name') && !isSubmitting) {
+            <span class="error-message">{{ getErrorMessage('name') }}</span>
+          }
+        </div>
+
+        <!-- Meal Description -->
+        <div class="form-group">
+          <label for="mealDescription" class="form-label">
+            وصف الوجبة <span class="required">*</span>
+          </label>
+          <textarea 
+            id="mealDescription"
+            class="form-textarea" 
+            placeholder="وصف مفصل للوجبة ومكوناتها..."
+            formControlName="description"
+            rows="4"
+            [class.error]="hasError('description')"
+          ></textarea>
+          @if (hasError('description') && !isSubmitting) {
+            <span class="error-message">{{ getErrorMessage('description') }}</span>
+          }
+        </div>
+
+        <!-- Meal Category -->
+        <div class="form-group">
+          <label class="form-label">
+            نوع الوجبة <span class="required">*</span>
+          </label>
+          <div class="custom-dropdown" [class.open]="isCategoryDropdownOpen">
+            <div 
+              class="dropdown-trigger" 
+              (click)="toggleCategoryDropdown(); $event.stopPropagation()"
+              [class.error]="hasError('category')"
+            >
+              <span class="dropdown-label">{{ getSelectedCategoryLabel() }}</span>
+              <svg class="dropdown-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+            @if (isCategoryDropdownOpen) {
+              <div class="dropdown-panel" (click)="$event.stopPropagation()">
+                @for (config of categoryConfigs; track config.value) {
+                  <div 
+                    class="dropdown-option"
+                    [class.selected]="mealForm.get('category')?.value === config.value"
+                    (click)="selectCategory(config.value)"
+                  >
+                    {{ config.label }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Nutrition Info (3 columns on desktop, stack on mobile) -->
+        <div class="nutrition-grid">
+          <!-- Calories -->
+          <div class="form-group">
+            <label for="calories" class="form-label">
+              السعرات <span class="required">*</span>
+            </label>
+            <input 
+              type="number" 
+              id="calories"
+              class="form-input" 
+              placeholder="450"
+              formControlName="calories"
+              min="1"
+              [class.error]="hasError('calories')"
+            />
+            @if (hasError('calories') && !isSubmitting) {
+              <span class="error-message">{{ getErrorMessage('calories') }}</span>
+            }
+          </div>
+
+          <!-- Protein -->
+          <div class="form-group">
+            <label for="protein" class="form-label">
+              البروتين (جرام) <span class="required">*</span>
+            </label>
+            <input 
+              type="number" 
+              id="protein"
+              class="form-input" 
+              placeholder="45"
+              formControlName="proteinGrams"
+              min="0"
+              [class.error]="hasError('proteinGrams')"
+            />
+            @if (hasError('proteinGrams') && !isSubmitting) {
+              <span class="error-message">{{ getErrorMessage('proteinGrams') }}</span>
+            }
+          </div>
+
+          <!-- Carbs -->
+          <div class="form-group">
+            <label for="carbs" class="form-label">
+              الكربوهيدرات (جرام) <span class="required">*</span>
+            </label>
+            <input 
+              type="number" 
+              id="carbs"
+              class="form-input" 
+              placeholder="50"
+              formControlName="carbsGrams"
+              min="0"
+              [class.error]="hasError('carbsGrams')"
+            />
+            @if (hasError('carbsGrams') && !isSubmitting) {
+              <span class="error-message">{{ getErrorMessage('carbsGrams') }}</span>
+            }
+          </div>
+        </div>
+
+        <!-- Availability -->
+        <div class="form-group">
+          <label class="form-label">
+            توفر الوجبة <span class="required">*</span>
+          </label>
+          <div class="custom-dropdown" [class.open]="isAvailabilityDropdownOpen">
+            <div 
+              class="dropdown-trigger" 
+              (click)="toggleAvailabilityDropdown(); $event.stopPropagation()"
+              [class.error]="hasError('availability')"
+            >
+              <span class="dropdown-label">{{ getSelectedAvailabilityLabel() }}</span>
+              <svg class="dropdown-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+            @if (isAvailabilityDropdownOpen) {
+              <div class="dropdown-panel" (click)="$event.stopPropagation()">
+                @for (config of availabilityConfigs; track config.value) {
+                  <div 
+                    class="dropdown-option"
+                    [class.selected]="mealForm.get('availability')?.value === config.value"
+                    (click)="selectAvailability(config.value)"
+                  >
+                    {{ config.label }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="modal-actions">
+          <button 
+            type="button" 
+            class="btn btn-secondary" 
+            (click)="onClose()"
+            [disabled]="isSubmitting"
+          >
+            إلغاء
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="isSubmitting"
+          >
+            @if (isSubmitting) {
+              <span>جاري الحفظ...</span>
+            } @else {
+              <span>{{ meal ? 'حفظ التعديلات' : 'حفظ الوجبة' }}</span>
+            }
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+}
