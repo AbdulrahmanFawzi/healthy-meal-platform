@@ -1,0 +1,113 @@
+<div class="order-review" dir="rtl">
+  <!-- Review Header Card -->
+  <div class="review-header-card">
+    <h1 class="header-title">مراجعة الطلب</h1>
+    <p class="header-subtitle">تحقق من اختياراتك قبل التأكيد</p>
+  </div>
+
+  <!-- Macros Summary (Light Green Box) -->
+  <div class="macros-summary">
+    <h2 class="summary-title">الإجماليات</h2>
+    <div class="macros-grid">
+      <div class="macro-card">
+        <div class="macro-label">بروتين</div>
+        <div class="macro-value">{{ orderDraft.totalProtein }}g</div>
+        <div class="macro-goal">من {{ proteinGoal }}g</div>
+      </div>
+      <div class="macro-card">
+        <div class="macro-label">كارب</div>
+        <div class="macro-value">{{ orderDraft.totalCarbs }}g</div>
+        <div class="macro-goal">من {{ carbsGoal }}g</div>
+      </div>
+      <div class="macro-card">
+        <div class="macro-label">سعرات</div>
+        <div class="macro-value">{{ orderDraft.totalCalories }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Meal 1 Card -->
+  <div class="meal-review-card">
+    <div class="meal-header">
+      <div class="meal-badge">1</div>
+      <h3 class="meal-title">الوجبة 1</h3>
+    </div>
+    <div class="meal-items">
+      <!-- Protein -->
+      @if (orderDraft.selectedMeal1Protein) {
+        <div class="meal-item">
+          <div class="item-details">
+            <span class="item-name">{{ orderDraft.selectedMeal1Protein.name }}</span>
+            <span class="item-chip protein-chip">بروتين</span>
+          </div>
+        </div>
+      }
+      <!-- Carb -->
+      @if (orderDraft.selectedMeal1Carb) {
+        <div class="meal-item">
+          <div class="item-details">
+            <span class="item-name">{{ orderDraft.selectedMeal1Carb.name }}</span>
+            <span class="item-chip carb-chip">كارب</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Meal 2 Card -->
+  <div class="meal-review-card">
+    <div class="meal-header">
+      <div class="meal-badge">2</div>
+      <h3 class="meal-title">الوجبة 2</h3>
+    </div>
+    <div class="meal-items">
+      <!-- Protein -->
+      @if (orderDraft.selectedMeal2Protein) {
+        <div class="meal-item">
+          <div class="item-details">
+            <span class="item-name">{{ orderDraft.selectedMeal2Protein.name }}</span>
+            <span class="item-chip protein-chip">بروتين</span>
+          </div>
+        </div>
+      }
+      <!-- Carb -->
+      @if (orderDraft.selectedMeal2Carb) {
+        <div class="meal-item">
+          <div class="item-details">
+            <span class="item-name">{{ orderDraft.selectedMeal2Carb.name }}</span>
+            <span class="item-chip carb-chip">كارب</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Snack Card (if selected) -->
+  @if (orderDraft.selectedSnack) {
+    <div class="meal-review-card">
+      <div class="meal-header">
+        <h3 class="meal-title">وجبة خفيفة</h3>
+      </div>
+      <div class="meal-items">
+        <div class="meal-item">
+          <div class="item-details">
+            <span class="item-name">{{ orderDraft.selectedSnack.name }}</span>
+            <span class="item-chip snack-chip">سناك</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Action Buttons -->
+  <div class="review-actions">
+    <button class="confirm-btn" (click)="confirmOrder()">
+      <span class="button-icon">✓</span>
+      تأكيد الطلب
+    </button>
+    <button class="back-btn" (click)="goBack()">
+      <span class="button-icon">←</span>
+      رجوع
+    </button>
+  </div>
+</div>

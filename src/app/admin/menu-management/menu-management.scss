@@ -225,16 +225,20 @@
 }
 
 .add-first-meal-btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 32px;
+  height: 36px;
+  padding: 0 20px;
   border: none;
   border-radius: 8px;
   background: #00A63E;
   color: #FFFFFF;
-  font-size: 16px;
-  font-weight: 600;
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0px;
   cursor: pointer;
   transition: all 0.2s;
 

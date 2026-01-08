@@ -1,0 +1,201 @@
+<div class="customer-home" dir="rtl">
+  <!-- Daily Menu Header Card -->
+  <div class="daily-menu-card">
+    <!-- Title -->
+    <h1 class="card-title">قائمة اليوم</h1>
+    
+    <!-- Goals Overlay Box -->
+    <div class="goals-overlay">
+      <div class="goals-content">
+        <div class="icon-badge">
+          <img src="assets/target-icon.svg" alt="target icon" width="32" height="32">
+        </div>
+        <div class="goals-text">
+          <div class="goals-label">الأهداف اليومية</div>
+          <div class="goals-values">{{ dailyGoals }}</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Progress Section -->
+    <div class="progress-section">
+      <div class="progress-labels">
+        <span class="progress-percentage">{{ progressPercentage }}</span>
+        <span class="meal-label">{{ mealLabel }}</span>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" [style.width.%]="progressValue"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Meal Selection Section -->
+  <div class="meal-selection-section">
+    
+    <!-- STEP 1: Protein Selection -->
+    @if (!isSnackStep) {
+      <div class="meal-category-section">
+        <div class="section-title-card">
+          <div class="meal-number-badge">{{ currentMealIndex }}</div>
+          <div class="title-content">
+            <h2 class="section-title">اختر البروتين</h2>
+            <p class="section-subtitle">اختر وجبة البروتين للوجبة {{ currentMealIndex }}</p>
+          </div>
+        </div>
+      
+      @if (loadingProtein) {
+        <div class="loading-state">جاري التحميل...</div>
+      } @else if (errorProtein) {
+        <div class="error-state">{{ errorProtein }}</div>
+      } @else if (proteinMeals.length === 0) {
+        <div class="empty-state">لا توجد وجبات بروتين متاحة</div>
+      } @else {
+        <div class="meals-grid">
+          @for (meal of proteinMeals; track meal._id) {
+            <div 
+              class="meal-card" 
+              [class.selected]="selectedProtein?._id === meal._id"
+              (click)="selectProtein(meal)">
+              <div class="meal-content">
+                <div class="meal-image">
+                  <img [src]="getMealImage(meal)" [alt]="meal.name">
+                </div>
+                <div class="meal-info">
+                  <h3 class="meal-name">{{ meal.name }}</h3>
+                  <p class="meal-description">{{ meal.description }}</p>
+                  <div class="meal-macros">
+                    {{ meal.calories }} سعرة · 
+                    {{ meal.proteinGrams }}g بروتين · 
+                    {{ meal.carbsGrams }}g كارب
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+    }
+    
+    <!-- STEP 2: Carb Selection (shown after protein selection) -->
+    @if (selectedProtein && !isSnackStep) {
+      <div class="meal-category-section">
+        <div class="section-title-card">
+          <div class="meal-number-badge">{{ currentMealIndex }}</div>
+          <div class="title-content">
+            <h2 class="section-title">اختر الكربوهيدرات</h2>
+            <p class="section-subtitle">اختر وجبة الكارب للوجبة {{ currentMealIndex }}</p>
+          </div>
+        </div>
+        
+        @if (loadingCarb) {
+          <div class="loading-state">جاري التحميل...</div>
+        } @else if (errorCarb) {
+          <div class="error-state">{{ errorCarb }}</div>
+        } @else if (carbMeals.length === 0) {
+          <div class="empty-state">لا توجد وجبات كربوهيدرات متاحة</div>
+        } @else {
+          <div class="meals-grid">
+            @for (meal of carbMeals; track meal._id) {
+              <div 
+                class="meal-card" 
+                [class.selected]="selectedCarb?._id === meal._id"
+                (click)="selectCarb(meal)">
+                <div class="meal-content">
+                  <div class="meal-image">
+                    <img [src]="getMealImage(meal)" [alt]="meal.name">
+                  </div>
+                  <div class="meal-info">
+                    <h3 class="meal-name">{{ meal.name }}</h3>
+                    <p class="meal-description">{{ meal.description }}</p>
+                    <div class="meal-macros">
+                      {{ meal.calories }} سعرة · 
+                      {{ meal.proteinGrams }}g بروتين · 
+                      {{ meal.carbsGrams }}g كارب
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+    
+    <!-- STEP 3: Snack Selection (optional) -->
+    @if (isSnackStep) {
+      <div class="meal-category-section">
+        <div class="section-title-card snack-header">
+          <div class="title-content">
+            <h2 class="section-title">وجبة خفيفة (اختيارية)</h2>
+            <p class="section-subtitle">يمكنك اختيار وجبة خفيفة أو تخطي هذه الخطوة</p>
+          </div>
+        </div>
+        
+        @if (loadingSnack) {
+          <div class="loading-state">جاري التحميل...</div>
+        } @else if (errorSnack) {
+          <div class="error-state">{{ errorSnack }}</div>
+        } @else if (snackMeals.length === 0) {
+          <div class="empty-state">لا توجد وجبات سناك متاحة</div>
+        } @else {
+          <div class="meals-grid">
+            @for (meal of snackMeals; track meal._id) {
+              <div 
+                class="meal-card" 
+                [class.selected]="orderDraft.selectedSnack?._id === meal._id"
+                (click)="selectSnack(meal)">
+                <div class="meal-content">
+                  <div class="meal-image">
+                    <img [src]="getMealImage(meal)" [alt]="meal.name">
+                  </div>
+                  <div class="meal-info">
+                    <h3 class="meal-name">{{ meal.name }}</h3>
+                    <p class="meal-description">{{ meal.description }}</p>
+                    <div class="meal-macros">
+                      {{ meal.calories }} سعرة · 
+                      {{ meal.proteinGrams }}g بروتين · 
+                      {{ meal.carbsGrams }}g كارب
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+        
+        <!-- Skip Snack Button -->
+        <div class="skip-snack-section">
+          <button class="skip-snack-btn" (click)="skipSnack()">
+            تخطي السناك
+          </button>
+        </div>
+      </div>
+    }
+    
+  </div>
+  
+  <!-- Next Meal Button (shown after meal 1 is complete) -->
+  @if (showNextMealButton) {
+    <div class="bottom-action-bar">
+      <button class="next-meal-btn" (click)="proceedToMeal2()">
+        الانتقال إلى الوجبة التالية
+      </button>
+    </div>
+  }
+  
+  <!-- Meal 2 Action Buttons (shown after meal 2 is complete) -->
+  @if (showMeal2ActionButtons) {
+    <div class="meal2-action-buttons">
+      <button class="back-button" (click)="goBackToMeal1()">
+        <span class="button-icon">←</span>
+        رجوع للوجبة الأولى
+      </button>
+      <button class="snack-button" (click)="proceedToSnack()">
+        الانتقال للسناك
+      </button>
+    </div>
+  }
+</div>

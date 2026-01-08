@@ -1,0 +1,19 @@
+@use '../../../styles/variables.scss' as *;
+
+.customer-order-history {
+  padding: 24px;
+  
+  h1 {
+    font-family: $font-family-base;
+    font-size: 24px;
+    font-weight: 700;
+    color: $text-primary;
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-family: $font-family-base;
+    font-size: 16px;
+    color: $text-secondary;
+  }
+}

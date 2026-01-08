@@ -44,7 +44,30 @@ export const routes: Routes = [
     path: 'customer',
     loadComponent: () => import('./customer/customer-layout/customer-layout').then(m => m.CustomerLayoutComponent),
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['customer'] }
+    data: { roles: ['customer'] },
+    children: [
+      {
+        path: '',
+        redirectTo: 'home',
+        pathMatch: 'full'
+      },
+      {
+        path: 'home',
+        loadComponent: () => import('./customer/home/home').then(m => m.CustomerHomeComponent)
+      },
+      {
+        path: 'order-review',
+        loadComponent: () => import('./customer/order-review/order-review').then(m => m.OrderReviewComponent)
+      },
+      {
+        path: 'my-orders',
+        loadComponent: () => import('./customer/my-orders/my-orders').then(m => m.CustomerMyOrdersComponent)
+      },
+      {
+        path: 'order-history',
+        loadComponent: () => import('./customer/order-history/order-history').then(m => m.CustomerOrderHistoryComponent)
+      }
+    ]
   },
   {
     path: 'platform',

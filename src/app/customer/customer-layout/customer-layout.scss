@@ -1,131 +1,38 @@
-.customer-container {
+@use '../../../styles/variables.scss' as *;
+
+.customer-layout {
+  display: flex;
   min-height: 100vh;
-  background: #F9FAFB;
+  background: $bg-page;
+  flex-direction: row-reverse; // RTL: sidebar on right
 }
 
-.customer-header {
-  background: #ffffff;
-  border-bottom: 1px solid #E5E7EB;
-  padding: 16px 20px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.header-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.restaurant-logo {
-  width: 40px;
-  height: 40px;
-  background: #00A63E;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.restaurant-info {
+.customer-content {
+  flex: 1;
+  margin-right: 280px; // Space for fixed sidebar
   display: flex;
   flex-direction: column;
-  gap: 2px;
-}
-
-.restaurant-name {
-  font-family: 'Cairo', sans-serif;
-  font-weight: 700;
-  font-size: 16px;
-  color: #101828;
-  margin: 0;
-}
-
-.user-role {
-  font-family: 'Cairo', sans-serif;
-  font-size: 12px;
-  color: #6B7280;
-  margin: 0;
-}
-
-.user-section {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.user-name {
-  font-family: 'Cairo', sans-serif;
-  font-weight: 500;
-  font-size: 14px;
-  color: #374151;
+  min-height: 100vh;
 }
 
 .customer-main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px 20px;
+  flex: 1;
+  overflow-y: auto;
+  background: $bg-page;
 }
 
-.welcome-card {
-  background: #ffffff;
-  border: 1px solid #E5E7EB;
-  border-radius: 16px;
-  padding: 40px;
-  text-align: center;
-
-  h2 {
-    font-family: 'Cairo', sans-serif;
-    font-weight: 700;
-    font-size: 24px;
-    color: #101828;
-    margin: 0 0 12px 0;
-  }
-
-  p {
-    font-family: 'Cairo', sans-serif;
-    font-size: 16px;
-    color: #6B7280;
-    margin: 0;
-  }
-}
-
+// Mobile responsive
 @media (max-width: 768px) {
-  .customer-header {
-    padding: 12px 16px;
+  .customer-content {
+    margin-right: 240px;
   }
+}
 
-  .restaurant-name {
-    font-size: 14px;
+@media (max-width: 480px) {
+  .customer-content {
+    margin-right: 0;
   }
-
-  .user-name {
-    font-size: 13px;
-  }
-
-  .customer-main {
-    padding: 20px 16px;
-  }
-
-  .welcome-card {
-    padding: 30px 20px;
-
-    h2 {
-      font-size: 20px;
-    }
-
-    p {
-      font-size: 14px;
-    }
-  }
+  
+  // On mobile, sidebar could be hidden or toggled
+  // For now, we keep it visible but could add toggle logic later
 }

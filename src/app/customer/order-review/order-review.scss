@@ -1,0 +1,252 @@
+@use '../../../styles/variables.scss' as *;
+
+.order-review {
+  padding: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+  
+  // Review Header Card
+  .review-header-card {
+    background: #FFFFFF;
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    text-align: right;
+    
+    .header-title {
+      font-family: $font-family-base;
+      font-size: 20px;
+      font-weight: 600;
+      color: $text-primary;
+      margin: 0 0 8px 0;
+    }
+    
+    .header-subtitle {
+      font-family: $font-family-base;
+      font-size: 14px;
+      font-weight: 400;
+      color: $text-secondary;
+      margin: 0;
+    }
+  }
+  
+  // Macros Summary (Light Green Box)
+  .macros-summary {
+    background: linear-gradient(#F0FDF4, #ECFDF5);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    
+    .summary-title {
+      font-family: $font-family-base;
+      font-size: 16px;
+      font-weight: 600;
+      color: $text-primary;
+      margin: 0 0 16px 0;
+      text-align: right;
+    }
+    
+    .macros-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      
+      .macro-card {
+        background: #FFFFFF;
+        border-radius: 8px;
+        padding: 12px;
+        text-align: center;
+        
+        .macro-label {
+          font-family: $font-family-base;
+          font-size: 12px;
+          font-weight: 500;
+          color: $text-secondary;
+          margin-bottom: 4px;
+        }
+        
+        .macro-value {
+          font-family: $font-family-base;
+          font-size: 20px;
+          font-weight: 700;
+          color: $text-primary;
+          margin-bottom: 4px;
+        }
+        
+        .macro-goal {
+          font-family: $font-family-base;
+          font-size: 11px;
+          font-weight: 400;
+          color: $text-secondary;
+        }
+      }
+    }
+  }
+  
+  // Meal Review Cards
+  .meal-review-card {
+    background: #FFFFFF;
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    
+    .meal-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      direction: rtl;
+      
+      .meal-badge {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #00C950 0%, #009966 100%);
+        color: #FFFFFF;
+        font-family: $font-family-base;
+        font-size: 16px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      
+      .meal-title {
+        font-family: $font-family-base;
+        font-size: 18px;
+        font-weight: 600;
+        color: $text-primary;
+        margin: 0;
+      }
+    }
+    
+    .meal-items {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      
+      .meal-item {
+        padding: 12px;
+        background: #F9FAFB;
+        border-radius: 8px;
+        
+        .item-details {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          direction: rtl;
+          
+          .item-name {
+            font-family: $font-family-base;
+            font-size: 14px;
+            font-weight: 600;
+            color: $text-primary;
+          }
+          
+          .item-chip {
+            font-family: $font-family-base;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 12px;
+          }
+          
+          .protein-chip {
+            background: #FEE2E2;
+            color: #DC2626;
+          }
+          
+          .carb-chip {
+            background: #FEF3C7;
+            color: #D97706;
+          }
+          
+          .snack-chip {
+            background: #DBEAFE;
+            color: #2563EB;
+          }
+        }
+      }
+    }
+  }
+  
+  // Action Buttons
+  .review-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+    
+    .confirm-btn {
+      width: 100%;
+      height: 36px;
+      background: linear-gradient(135deg, #00C950 0%, #009966 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      font-family: $font-family-base;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 20px;
+      letter-spacing: 0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0, 201, 80, 0.2);
+      
+      .button-icon {
+        font-size: 16px;
+      }
+      
+      &:hover {
+        box-shadow: 0 4px 12px rgba(0, 201, 80, 0.3);
+        transform: translateY(-1px);
+      }
+      
+      &:active {
+        transform: translateY(0);
+      }
+    }
+    
+    .back-btn {
+      width: 100%;
+      height: 36px;
+      background: #FFFFFF;
+      color: $text-primary;
+      border: 2px solid #E5E7EB;
+      border-radius: 12px;
+      font-family: $font-family-base;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 20px;
+      letter-spacing: 0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      direction: rtl;
+      
+      .button-icon {
+        font-size: 16px;
+        transform: scaleX(-1);
+      }
+      
+      &:hover {
+        border-color: #9CA3AF;
+        background: #F9FAFB;
+      }
+      
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+  }
+}

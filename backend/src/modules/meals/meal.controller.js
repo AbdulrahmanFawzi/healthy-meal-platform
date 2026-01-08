@@ -14,8 +14,14 @@ const mealService = require('./meal.service');
  */
 async function getMeals(req, res, next) {
   try {
-    const { restaurantId } = req.user; // Extracted from JWT by auth middleware
-    const filters = req.query; // availability, category, isActive, q
+    const { restaurantId, role } = req.user; // Extracted from JWT by auth middleware
+    const filters = { ...req.query }; // availability, category, isActive, q
+
+    // CUSTOMER-SPECIFIC FILTER: Force isActive=true for customers
+    // Admins can see all meals (including inactive) unless explicitly filtered
+    if (role === 'customer') {
+      filters.isActive = 'true'; // Customers only see active meals
+    }
 
     const meals = await mealService.getMeals(restaurantId, filters);
 

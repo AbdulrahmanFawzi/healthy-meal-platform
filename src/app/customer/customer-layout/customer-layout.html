@@ -1,39 +1,15 @@
-<!-- Customer Dashboard Container - RTL Arabic layout -->
-<!-- Access: Protected by authGuard and roleGuard (role: 'customer') -->
-<div class="customer-container" dir="rtl">
-  
-  <!-- Customer Header - Shows restaurant branding and customer info -->
-  <header class="customer-header">
-    <div class="header-content">
-      
-      <!-- Restaurant Logo and Info Section -->
-      <div class="logo-section">
-        <!-- Restaurant Logo Placeholder - Will display restaurant.logoUrl -->
-        <div class="restaurant-logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
-          </svg>
-        </div>
-        <!-- Restaurant Name and Page Title -->
-        <div class="restaurant-info">
-          <h1 class="restaurant-name">{{ restaurantName }}</h1>
-          <p class="user-role">الصفحة الرئيسية</p>
-        </div>
-      </div>
-      
-      <!-- User Information Section -->
-      <div class="user-section">
-        <span class="user-name">{{ userName }}</span>
-      </div>
-    </div>
-  </header>
+<div class="customer-layout" dir="rtl">
+  <!-- Sidebar (right side in RTL) -->
+  <app-customer-sidebar></app-customer-sidebar>
 
   <!-- Main Content Area -->
-  <main class="customer-main">
-    <!-- Placeholder Welcome Card - Will be replaced with meal menu and ordering interface -->
-    <div class="welcome-card">
-      <h2>مرحباً بك</h2>
-      <p>سيتم إضافة قائمة الوجبات قريباً</p>
-    </div>
-  </main>
+  <div class="customer-content">
+    <!-- Header -->
+    <app-customer-header></app-customer-header>
+    
+    <!-- Page Content (router-outlet for child routes) -->
+    <main class="customer-main">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
 </div>
