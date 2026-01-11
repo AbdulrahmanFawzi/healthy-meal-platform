@@ -1,4 +1,19 @@
 <div class="page-container" dir="rtl">
   <h1 class="page-title">لوحة التحكم</h1>
   <p class="page-subtitle">مرحباً بك في لوحة تحكم المطعم</p>
+
+  <!-- Section 1: Header KPI Cards -->
+  <app-dashboard-header-stats />
+
+  <!-- Sections 2 & 3: Two Column Layout -->
+  <div class="dashboard-two-column">
+    <!-- Section 2: Order Status Chart -->
+    <app-dashboard-order-status-chart />
+
+    <!-- Section 3: Today's Menu -->
+    <app-dashboard-today-menu />
+  </div>
+
+  <!-- Section 4: Recent Orders Table -->
+  <app-dashboard-latest-orders />
 </div>

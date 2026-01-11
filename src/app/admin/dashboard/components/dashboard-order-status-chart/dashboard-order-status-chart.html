@@ -1,0 +1,32 @@
+<div class="order-status-card">
+  <h2 class="order-status-title">حالة الطلبات</h2>
+  
+  <div class="chart-container">
+    <!-- SVG Pie Chart -->
+    <svg class="pie-chart" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+      @for (segment of getPieChartSegments(); track segment.label) {
+        <path 
+          [attr.d]="segment.path" 
+          [attr.fill]="segment.color"
+          class="pie-segment"
+        />
+      }
+      <!-- Center circle for donut effect -->
+      <circle cx="80" cy="80" r="38" fill="white" />
+      <!-- Total in center -->
+      <text x="80" y="75" text-anchor="middle" class="chart-total-label">إجمالي</text>
+      <text x="80" y="95" text-anchor="middle" class="chart-total-value">{{ totalOrders }}</text>
+    </svg>
+  </div>
+
+  <!-- Legend -->
+  <div class="chart-legend">
+    @for (status of orderStatuses; track status.label) {
+      <div class="legend-item">
+        <div class="legend-color" [style.background-color]="status.color"></div>
+        <span class="legend-label">{{ status.label }}</span>
+        <span class="legend-value">{{ status.value }}</span>
+      </div>
+    }
+  </div>
+</div>

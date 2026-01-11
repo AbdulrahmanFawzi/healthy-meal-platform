@@ -1,0 +1,34 @@
+<div class="recent-orders-card">
+  <h2 class="orders-title">الطلبات الأخيرة</h2>
+  
+  <div class="table-container">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>رقم الطلب</th>
+          <th>العميل</th>
+          <th>عدد الوجبات</th>
+          <th>الحالة</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (order of latestOrders; track order.orderNumber) {
+          <tr>
+            <td class="order-number">{{ order.orderNumber }}</td>
+            <td class="customer-name">{{ order.customerName }}</td>
+            <td class="meals-count">{{ getMealsCountText(order) }}</td>
+            <td>
+              <span 
+                class="status-badge"
+                [style.color]="getStatusColor(order.status)"
+                [style.background-color]="getStatusBg(order.status)"
+              >
+                {{ getStatusLabel(order.status) }}
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

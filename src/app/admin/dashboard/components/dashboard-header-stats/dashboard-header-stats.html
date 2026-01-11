@@ -1,0 +1,18 @@
+<div class="kpi-cards-grid">
+  @for (card of kpiCards; track card.title) {
+    <div class="kpi-card">
+      <div class="kpi-card-content">
+        <div class="kpi-icon-container" [class]="'kpi-icon-container-' + card.type">
+          <img [src]="card.icon" [alt]="card.title" class="kpi-icon">
+        </div>
+        <div class="kpi-info">
+          <h3 class="kpi-title">{{ card.title }}</h3>
+          <div class="kpi-value">{{ card.value }}</div>
+          @if (card.trend) {
+            <div class="kpi-trend">{{ card.trend }}</div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,40 @@
+<div class="todays-menu-card">
+  <div class="menu-header">
+    <h2 class="menu-title">قائمة اليوم</h2>
+    <span class="menu-count">{{ todaysMeals.length }} عنصر</span>
+  </div>
+
+  <div class="meal-list">
+    @if (todaysMeals.length === 0) {
+      <div class="empty-state">
+        <p>لا توجد وجبات نشطة حالياً</p>
+      </div>
+    }
+    @for (meal of todaysMeals; track meal._id) {
+      <div class="meal-row">
+        <div class="meal-thumbnail">
+          <img 
+            [src]="getMealImageUrl(meal)" 
+            [alt]="meal.name"
+            (error)="onMealImgError($event)"
+          />
+        </div>
+        <div class="meal-details">
+          <div class="meal-header-row">
+            <h3 class="meal-name">{{ meal.name }}</h3>
+            <span 
+              class="meal-category-badge"
+              [style.color]="getMealCategoryConfig(meal.category).color"
+              [style.background-color]="getMealCategoryConfig(meal.category).backgroundColor"
+            >
+              {{ getMealCategoryConfig(meal.category).label }}
+            </span>
+          </div>
+          <div class="meal-macros">
+            {{ meal.proteinGrams }}ج بروتين · {{ meal.carbsGrams }}ج كارب
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
