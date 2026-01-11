@@ -1,17 +1,601 @@
-.page-container {
-  padding: 24px;
+@use 'sass:color';
+@use '../../../styles/variables' as *;
+
+.orders-page {
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
 }
 
-.page-title {
-  font-family: 'Cairo', sans-serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 8px;
+// ========================================
+// PAGE HEADER
+// ========================================
+.page-header {
+  margin-bottom: 2rem;
+
+  .header-text {
+    text-align: right;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0 0 0.5rem 0;
+
+    @media (max-width: 768px) {
+      font-size: 1.5rem;
+    }
+  }
+
+  .page-subtitle {
+    font-size: 1rem;
+    color: $text-secondary;
+    margin: 0;
+  }
 }
 
-.page-subtitle {
+// ========================================
+// SHARED CONTENT CONTAINER (filters + orders)
+// ========================================
+.orders-content {
+  width: 100%;
+  max-width: 797px;
+  margin: 0 auto;
+}
+
+// ========================================
+// FILTERS TOOLBAR CARD
+// ========================================
+.filters-toolbar-card {
+  background: $surface-primary;
+  border: 1px solid $border-light;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+
+  width: 100%;
+  height: 70px;
+
+  // clip to keep clean rounded corners
+  overflow: visible;
+
+  @media (max-width: 1024px) {
+    height: auto;
+  }
+}
+
+.toolbar-content {
+  // RTL layout so first element appears on the RIGHT
+  direction: rtl;
+
+  display: flex;
+  flex-direction: row; // Explicit row on desktop
+  align-items: center;
+
+  // Gap between search and filter
+  gap: 16px;
+
+  // Vertically center controls inside 70px card
+  padding: 0 17px;
+  height: 100%;
+
+  @media (max-width: 1024px) {
+    height: auto;
+    padding: 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+}
+
+.search-wrapper {
+  position: relative;
+  flex: 1; // Grow to fill available space
+  max-width: 500px; // Reduced to fit within card with gap and filter
+  height: 36px;
+  margin-left: 43px; // Space on left (between search and filter in RTL)
+
+  @media (max-width: 1024px) {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+  }
+}
+
+.search-input {
+  width: 100%;
+  height: 36px;
+  display: block;
+
+  padding: 0 12px;
+  padding-right: 38px; // space for icon on the right (RTL)
+  border: 1.5px solid $border-light;
+  border-radius: 8px;
+
+  font-size: 14px;
+  color: $text-primary;
+  background: $surface-primary;
+  transition: all 0.2s;
   font-family: 'Cairo', sans-serif;
-  font-size: 16px;
+  line-height: 20px;
+
+  &::placeholder {
+    color: #9CA3AF;
+    font-weight: 400;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    background: #FFFFFF;
+  }
+}
+
+.search-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   color: #6B7280;
+  pointer-events: none;
+  width: 18px;
+  height: 18px;
+}
+
+.filter-wrapper {
+  position: relative; // IMPORTANT: for dropdown panel absolute positioning
+  width: 192px;
+  height: 36px;
+  flex-shrink: 0; // Keep fixed width on large screens
+
+  @media (max-width: 1024px) {
+    width: 100%;
+    flex-shrink: 1;
+  }
+}
+
+// ========================================
+// CUSTOM DROPDOWN (matches meal modal)
+// ========================================
+.custom-dropdown {
+  width: 100%;
+  height: 36px;
+
+  display: flex;
+  flex-direction: row-reverse; // Arrow on LEFT, text on RIGHT
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 12px;
+  border: 1.5px solid $border-light;
+  border-radius: 8px;
+
+  font-size: 14px;
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none; // Prevent text selection on click
+
+  &:hover {
+    border-color: color.adjust($border-light, $lightness: -6%);
+  }
+
+  &.open {
+    border-color: $primary-color;
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px color.adjust($primary-color, $alpha: -0.9);
+  }
+
+  &.error {
+    border-color: #DC2626;
+  }
+}
+
+.dropdown-label {
+  font-size: 14px;
+  color: #111827;
+  flex: 1;
+  text-align: right;
+  font-family: 'Cairo', sans-serif;
+  line-height: 20px;
+}
+
+.dropdown-arrow {
+  flex-shrink: 0;
+  color: #6B7280;
+  transition: transform 0.2s;
+  width: 18px;
+  height: 18px;
+
+  .custom-dropdown.open & {
+    transform: rotate(180deg);
+  }
+}
+
+.dropdown-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+
+  background: #FFFFFF;
+  border: 1px solid $border-light;
+  border-radius: 10px;
+
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.10);
+  max-height: 220px;
+  overflow-y: auto;
+
+  z-index: 1000;
+  animation: dropdownSlideIn 0.15s ease-out;
+
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #F9FAFB;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #D1D5DB;
+    border-radius: 10px;
+
+    &:hover {
+      background: #9CA3AF;
+    }
+  }
+}
+
+.dropdown-option {
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: 'Cairo', sans-serif;
+  text-align: right;
+
+  &:hover {
+    background: #F3F4F6;
+  }
+
+  &.selected {
+    background: #F0FDF4;
+    color: #00A63E;
+    font-weight: 500;
+  }
+
+  &:first-child {
+    border-radius: 10px 10px 0 0;
+  }
+
+  &:last-child {
+    border-radius: 0 0 10px 10px;
+  }
+}
+
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ========================================
+// LOADING STATE
+// ========================================
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: $text-secondary;
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid $border-light;
+    border-top-color: $primary-color;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 1rem;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+}
+
+// ========================================
+// ORDERS LIST
+// ========================================
+.orders-list {
+  display: grid;
+  grid-template-columns: 1fr; // Single column at all screen sizes
+  gap: 1.5rem;
+}
+
+// ========================================
+// ORDER CARD
+// ========================================
+.order-card {
+  background: $surface-primary;
+  border: 1px solid $border-light;
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px color.adjust($primary-color, $alpha: -0.9);
+    border-color: color.adjust($primary-color, $alpha: -0.7);
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid $border-light;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+}
+
+.customer-info {
+  flex: 1;
+  min-width: 0;
+
+  .customer-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0 0 0.25rem 0;
+  }
+
+  .order-number {
+    font-size: 0.875rem;
+    color: $text-secondary;
+    font-weight: 500;
+  }
+}
+
+.order-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    flex-direction: column-reverse;
+    width: 100%;
+    gap: 0.75rem;
+  }
+}
+
+.order-status-wrapper {
+  position: relative; // For dropdown panel positioning
+  
+  .order-status-dropdown {
+    width: 160px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    .order-status-dropdown {
+      width: 100%;
+    }
+  }
+}
+
+.notify-btn {
+  height: 36px;
+  padding: 0 1.25rem;
+  background: linear-gradient(135deg, $primary-color 0%, color.adjust($primary-color, $lightness: -10%) 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px color.adjust($primary-color, $alpha: -0.6);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+// ========================================
+// DAILY GOALS
+// ========================================
+.daily-goals {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: color.adjust($primary-color, $alpha: -0.95);
+  border-radius: 12px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .goal-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    .goal-label {
+      font-size: 0.75rem;
+      color: $text-tertiary;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .goal-value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: $text-primary;
+    }
+  }
+}
+
+// ========================================
+// MEAL SELECTIONS
+// ========================================
+.meal-selections {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.meal-pair {
+  .pair-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $text-secondary;
+    margin-bottom: 0.75rem;
+    padding-right: 0.5rem;
+    border-right: 3px solid $primary-color;
+  }
+}
+
+.snack-section {
+  .pair-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $text-secondary;
+    margin-bottom: 0.75rem;
+    padding-right: 0.5rem;
+    border-right: 3px solid $accent-color;
+  }
+}
+
+.meal-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: $surface-secondary;
+  border-radius: 12px;
+  margin-bottom: 0.75rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 768px) {
+    gap: 0.75rem;
+  }
+}
+
+.meal-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+.meal-info {
+  flex: 1;
+  min-width: 0;
+
+  .meal-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .meal-macros {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: $text-secondary;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    span {
+      white-space: nowrap;
+    }
+  }
+}
+
+// ========================================
+// EMPTY STATE
+// ========================================
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+
+  .empty-icon {
+    color: $text-tertiary;
+    opacity: 0.5;
+    margin-bottom: 1.5rem;
+  }
+
+  .empty-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .empty-description {
+    font-size: 1rem;
+    color: $text-secondary;
+    margin: 0;
+  }
 }

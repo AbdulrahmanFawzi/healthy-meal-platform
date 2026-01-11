@@ -1,4 +1,166 @@
-<div class="customer-my-orders" dir="rtl">
-  <h1>طلباتي</h1>
-  <p>صفحة طلباتي - قيد التطوير</p>
+<div class="my-orders-page" dir="rtl">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1 class="page-title">حالة الطلب</h1>
+    <p class="page-subtitle">تتبع طلبك الحالي</p>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>جاري تحميل الطلب...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error && !isLoading) {
+    <div class="error-state">
+      <p>{{ error }}</p>
+    </div>
+  }
+
+  <!-- No Order State -->
+  @if (!order && !isLoading && !error) {
+    <div class="empty-state">
+      <svg class="empty-icon" width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="2"/>
+        <path d="M32 20v24M20 32h24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <h3>لا يوجد طلب اليوم</h3>
+      <p>لم تقم بتقديم طلب اليوم بعد</p>
+    </div>
+  }
+
+  <!-- Order Content -->
+  @if (order && !isLoading) {
+    <div class="order-content">
+      <!-- Order Card -->
+      <div class="order-card">
+        <!-- Order Number -->
+        <div class="order-number-section">
+          <span class="label">رقم الطلب</span>
+          <span class="number">{{ order.orderNumber }}</span>
+        </div>
+
+        <!-- Status Timeline -->
+        <div class="status-timeline">
+          @for (step of timelineSteps; track trackByIndex($index)) {
+            <div class="timeline-step" [class.completed]="step.status === 'completed'" [class.current]="step.status === 'current'">
+              <!-- Icon Circle -->
+              <div class="step-icon">
+                @if (step.icon === 'check') {
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                }
+                @if (step.icon === 'spinner') {
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83"></path>
+                  </svg>
+                }
+                @if (step.icon === 'box') {
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                  </svg>
+                }
+              </div>
+
+              <!-- Connector Line -->
+              @if ($index < timelineSteps.length - 1) {
+                <div class="step-connector"></div>
+              }
+
+              <!-- Label -->
+              <div class="step-content">
+                <div class="step-label">{{ step.label }}</div>
+                <div class="step-sublabel">{{ step.subLabel }}</div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Daily Goals -->
+        @if (order.macroTargets) {
+          <div class="daily-goals">
+            <div class="goals-header">
+              <svg class="target-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="12" r="2"></circle>
+              </svg>
+              <span>أهدافك اليومية</span>
+            </div>
+            <div class="goals-grid">
+              <div class="goal-card">
+                <div class="goal-value">{{ order.macroTargets.carbsGrams }}g</div>
+                <div class="goal-label">كربوهيدرات</div>
+              </div>
+              <div class="goal-card">
+                <div class="goal-value">{{ order.macroTargets.proteinGrams }}g</div>
+                <div class="goal-label">بروتين</div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Order Details -->
+        <div class="order-details">
+          <h3 class="section-title">تفاصيل الطلب</h3>
+
+          <!-- Meal Selections -->
+          @for (selection of order.selections; track trackByIndex($index)) {
+            <div class="meal-section">
+              <div class="meal-section-title">الوجبة {{ $index + 1 }}</div>
+
+              <!-- Protein Meal -->
+              <div class="meal-row">
+                <img [src]="getMealImage(selection.proteinMeal.imageUrl)" [alt]="selection.proteinMeal.name" class="meal-image" />
+                <div class="meal-info">
+                  <div class="meal-name">{{ selection.proteinMeal.name }}</div>
+                  <div class="meal-macros">
+                    <span>{{ selection.proteinMeal.proteinGrams }}g بروتين</span>
+                    <span>•</span>
+                    <span>{{ selection.proteinMeal.calories }} سعرة</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Carb Meal -->
+              <div class="meal-row">
+                <img [src]="getMealImage(selection.carbMeal.imageUrl)" [alt]="selection.carbMeal.name" class="meal-image" />
+                <div class="meal-info">
+                  <div class="meal-name">{{ selection.carbMeal.name }}</div>
+                  <div class="meal-macros">
+                    <span>{{ selection.carbMeal.carbsGrams }}g كارب</span>
+                    <span>•</span>
+                    <span>{{ selection.carbMeal.calories }} سعرة</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Snack (if selected) -->
+          @if (order.snackMeal && order.snackMeal.mealId) {
+            <div class="snack-section">
+              <div class="meal-section-title">وجبة خفيفة</div>
+              <div class="meal-row snack">
+                <img [src]="getMealImage(order.snackMeal.imageUrl)" [alt]="order.snackMeal.name" class="meal-image" />
+                <div class="meal-info">
+                  <div class="meal-name">{{ order.snackMeal.name }}</div>
+                  <div class="meal-macros">
+                    <span>{{ order.snackMeal.calories }} سعرة</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
 </div>

@@ -1,4 +1,232 @@
-<div class="page-container" dir="rtl">
-  <h1 class="page-title">الطلبات</h1>
-  <p class="page-subtitle">عرض وإدارة الطلبات اليومية</p>
+<div class="orders-page" dir="rtl">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-text">
+      <h1 class="page-title">طلبات اليوم</h1>
+      <p class="page-subtitle">تتبع وإدارة جميع طلبات العملاء</p>
+    </div>
+  </div>
+
+  <!-- Shared centered content container -->
+  <div class="orders-content">
+    <!-- Filters Toolbar Card -->
+    <div class="filters-toolbar-card" (click)="closeStatusDropdown()">
+    <div class="toolbar-content">
+      <!-- Search Input (First/Right side in RTL) -->
+      <div class="search-wrapper">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="البحث بالاسم أو رقم الطلب..."
+          [value]="searchQuery"
+          (input)="onSearchChange($any($event.target).value)"
+        />
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <!-- Status Filter (Second/Left side in RTL) -->
+      <div class="filter-wrapper">
+        <div 
+          class="custom-dropdown" 
+          [class.open]="isStatusDropdownOpen"
+          (click)="toggleStatusDropdown(); $event.stopPropagation()"
+        >
+          <svg class="dropdown-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+          <span class="dropdown-label">{{ getSelectedStatusLabel() }}</span>
+          @if (isStatusDropdownOpen) {
+            <div class="dropdown-panel" (click)="$event.stopPropagation()">
+              @for (option of statusOptions; track option.value) {
+                <div 
+                  class="dropdown-option"
+                  [class.selected]="selectedStatus === option.value"
+                  (click)="selectStatus($any(option.value))"
+                >
+                  {{ option.label }}
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>جاري تحميل الطلبات...</p>
+    </div>
+  }
+
+  <!-- Orders List -->
+  @if (!isLoading && orders.length > 0) {
+    <div class="orders-list">
+      @for (order of orders; track trackByOrderId($index, order)) {
+        <div class="order-card">
+          <!-- Card Header -->
+          <div class="order-header">
+            <div class="customer-info">
+              <h3 class="customer-name">{{ order.customerId.name || 'عميل' }}</h3>
+              <span class="order-number">{{ order.orderNumber }}</span>
+            </div>
+
+            <!-- Actions Group (Status + Notify Button) -->
+            <div class="order-actions">
+              <!-- Order Status -->
+              <div class="order-status-wrapper">
+              <div 
+                class="custom-dropdown order-status-dropdown" 
+                [class.open]="order._id === openOrderStatusId"
+                (click)="toggleOrderStatusDropdown(order._id); $event.stopPropagation()"
+              >
+                <svg class="dropdown-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+                <span class="dropdown-label">{{ statusLabels[order.status] }}</span>
+                @if (order._id === openOrderStatusId) {
+                  <div class="dropdown-panel" (click)="$event.stopPropagation()">
+                    <div 
+                      class="dropdown-option"
+                      [class.selected]="order.status === 'received'"
+                      (click)="onStatusChange(order, 'received')"
+                    >
+                      قيد الاستلام
+                    </div>
+                    <div 
+                      class="dropdown-option"
+                      [class.selected]="order.status === 'preparing'"
+                      (click)="onStatusChange(order, 'preparing')"
+                    >
+                      قيد التحضير
+                    </div>
+                    <div 
+                      class="dropdown-option"
+                      [class.selected]="order.status === 'ready'"
+                      (click)="onStatusChange(order, 'ready')"
+                    >
+                      جاهز
+                    </div>
+                    <div 
+                      class="dropdown-option"
+                      [class.selected]="order.status === 'completed'"
+                      (click)="onStatusChange(order, 'completed')"
+                    >
+                      مكتمل
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+              @if (order.status === 'ready') {
+                <button
+                  class="notify-btn"
+                  (click)="sendNotification(order)"
+                >
+                  إرسال إشعار
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Daily Goals -->
+          @if (order.macroTargets) {
+            <div class="daily-goals">
+              <div class="goal-item">
+                <span class="goal-label">البروتين:</span>
+                <span class="goal-value">{{ order.totals.proteinGrams }}g / {{ order.macroTargets.proteinGrams }}g</span>
+              </div>
+              <div class="goal-item">
+                <span class="goal-label">الكربوهيدرات:</span>
+                <span class="goal-value">{{ order.totals.carbsGrams }}g / {{ order.macroTargets.carbsGrams }}g</span>
+              </div>
+              <div class="goal-item">
+                <span class="goal-label">الوجبات:</span>
+                <span class="goal-value">{{ order.selections.length }} وجبات</span>
+              </div>
+            </div>
+          }
+
+          <!-- Meal Selections -->
+          <div class="meal-selections">
+            @for (selection of order.selections; track $index) {
+              <div class="meal-pair">
+                <div class="pair-label">الوجبة {{ $index + 1 }}</div>
+                
+                <!-- Protein Meal -->
+                <div class="meal-item">
+                  <img
+                    [src]="getMealImage(selection.proteinMeal.imageUrl)"
+                    [alt]="selection.proteinMeal.name"
+                    class="meal-image"
+                  />
+                  <div class="meal-info">
+                    <div class="meal-name">{{ selection.proteinMeal.name }}</div>
+                    <div class="meal-macros">
+                      <span>{{ selection.proteinMeal.calories }} سعرة</span>
+                      <span>{{ selection.proteinMeal.proteinGrams }}g بروتين</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Carb Meal -->
+                <div class="meal-item">
+                  <img
+                    [src]="getMealImage(selection.carbMeal.imageUrl)"
+                    [alt]="selection.carbMeal.name"
+                    class="meal-image"
+                  />
+                  <div class="meal-info">
+                    <div class="meal-name">{{ selection.carbMeal.name }}</div>
+                    <div class="meal-macros">
+                      <span>{{ selection.carbMeal.calories }} سعرة</span>
+                      <span>{{ selection.carbMeal.carbsGrams }}g كارب</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- Snack (if selected) -->
+            @if (order.snackMeal) {
+              <div class="snack-section">
+                <div class="pair-label">سناك إضافي</div>
+                <div class="meal-item">
+                  <img
+                    [src]="getMealImage(order.snackMeal.imageUrl)"
+                    [alt]="order.snackMeal.name"
+                    class="meal-image"
+                  />
+                  <div class="meal-info">
+                    <div class="meal-name">{{ order.snackMeal.name }}</div>
+                    <div class="meal-macros">
+                      <span>{{ order.snackMeal.calories }} سعرة</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading && orders.length === 0) {
+    <div class="empty-state">
+      <svg class="empty-icon" width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="2"/>
+        <path d="M32 20v24M20 32h24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <h3 class="empty-title">لا توجد طلبات</h3>
+      <p class="empty-description">لم يتم استلام أي طلبات اليوم حتى الآن</p>
+    </div>
+  }
+  </div> <!-- /orders-content -->
 </div>

@@ -1,4 +1,112 @@
-<div class="customer-order-history" dir="rtl">
-  <h1>سجل الطلبات</h1>
-  <p>صفحة سجل الطلبات - قيد التطوير</p>
+<div class="order-history-page" dir="rtl">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1 class="page-title">سجل الطلبات</h1>
+    <p class="page-subtitle">شاهد طلباتك السابقة</p>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>جاري تحميل الطلبات...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error && !isLoading) {
+    <div class="error-state">
+      <p>{{ error }}</p>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!orders.length && !isLoading && !error) {
+    <div class="empty-state">
+      <svg class="empty-icon" width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="2"/>
+        <path d="M32 20v24M20 32h24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <h3>لا يوجد طلبات سابقة</h3>
+      <p>لم تقم بتقديم أي طلبات بعد</p>
+    </div>
+  }
+
+  <!-- Orders List -->
+  @if (orders.length > 0 && !isLoading) {
+    <div class="orders-list">
+      @for (order of orders; track trackByOrderId($index, order)) {
+        <div class="order-card">
+          <!-- Card Header -->
+          <div class="card-header">
+            <!-- Order Info (Right Side) -->
+            <div class="order-info">
+              <div class="order-number">طلب {{ order.orderNumber }}</div>
+              <div class="order-date">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span>{{ formatDate(order.createdAt) }} هـ</span>
+              </div>
+            </div>
+
+            <!-- Status Badge (Left Side) -->
+            <div class="status-badge" [ngClass]="getStatusClass(order.status)">
+              {{ getStatusLabel(order.status) }}
+            </div>
+          </div>
+
+          <!-- Card Body (Meals) -->
+          <div class="card-body">
+            <!-- Meal Selections -->
+            @for (selection of order.selections; track trackByIndex($index)) {
+              <div class="meal-section">
+                <div class="meal-section-title">الوجبة {{ $index + 1 }}</div>
+
+                <!-- Protein Meal -->
+                <div class="meal-row">
+                  <img [src]="getMealImage(selection.proteinMeal.imageUrl)" [alt]="selection.proteinMeal.name" class="meal-thumbnail" />
+                  <div class="meal-content">
+                    <div class="meal-name">{{ selection.proteinMeal.name }}</div>
+                    <div class="meal-category">بروتين</div>
+                  </div>
+                </div>
+
+                <!-- Carb Meal -->
+                <div class="meal-row">
+                  <img [src]="getMealImage(selection.carbMeal.imageUrl)" [alt]="selection.carbMeal.name" class="meal-thumbnail" />
+                  <div class="meal-content">
+                    <div class="meal-name">{{ selection.carbMeal.name }}</div>
+                    <div class="meal-category">كربوهيدرات</div>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- Snack (if exists) -->
+            @if (order.snackMeal && order.snackMeal.mealId) {
+              <div class="snack-section">
+                <div class="meal-row snack">
+                  <img [src]="getMealImage(order.snackMeal.imageUrl)" [alt]="order.snackMeal.name" class="meal-thumbnail" />
+                  <div class="meal-content">
+                    <div class="meal-name">{{ order.snackMeal.name }}</div>
+                    <div class="meal-category snack-label">وجبة خفيفة</div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Card Footer -->
+          <div class="card-footer">
+            <div class="footer-label">إجمالي الوجبات</div>
+            <div class="meals-count">{{ getMealsCountText(order) }}</div>
+          </div>
+        </div>
+      }
+    </div>
+  }
 </div>

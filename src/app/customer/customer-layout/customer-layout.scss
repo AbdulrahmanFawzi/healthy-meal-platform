@@ -9,7 +9,7 @@
 
 .customer-content {
   flex: 1;
-  margin-right: 280px; // Space for fixed sidebar
+  margin-right: 240px; // Space for fixed sidebar
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -24,7 +24,7 @@
 // Mobile responsive
 @media (max-width: 768px) {
   .customer-content {
-    margin-right: 240px;
+    margin-right: 220px;
   }
 }
 

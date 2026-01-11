@@ -53,21 +53,42 @@ router.use('/auth', authRoutes);
 const mealRoutes = require('../modules/meals/meal.routes');
 router.use('/meals', mealRoutes);
 
+/**
+ * Orders Routes
+ * -------------
+ * Handles order creation and management.
+ * Base path: /api/orders
+ * 
+ * Available endpoints:
+ * - POST /api/orders (customer)
+ * - GET /api/orders/today (admin)
+ * - GET /api/orders/my (customer)
+ * - PATCH /api/orders/:id/status (admin)
+ * - POST /api/orders/:id/notify (admin)
+ */
+const orderRoutes = require('../modules/orders/order.routes');
+router.use('/orders', orderRoutes);
+
+/**
+ * Notifications Routes
+ * --------------------
+ * Handles customer notifications.
+ * Base path: /api/notifications
+ * 
+ * Available endpoints:
+ * - GET /api/notifications/my (customer)
+ * - PATCH /api/notifications/:id/read (customer)
+ */
+const notificationRoutes = require('../modules/notifications/notification.routes');
+router.use('/notifications', notificationRoutes);
+
 // ===========================
 // Future API Routes
 // ===========================
 
-// TODO: Mount orders routes (restaurant-scoped)
-// const ordersRoutes = require('../modules/orders/orders.routes');
-// router.use('/orders', ordersRoutes);
-
 // TODO: Mount subscriptions routes (restaurant-scoped)
 // const subscriptionsRoutes = require('../modules/subscriptions/subscriptions.routes');
 // router.use('/subscriptions', subscriptionsRoutes);
-
-// TODO: Mount notifications routes (restaurant-scoped)
-// const notificationsRoutes = require('../modules/notifications/notifications.routes');
-// router.use('/notifications', notificationsRoutes);
 
 // TODO: Mount platform routes (super_admin only)
 // const platformRoutes = require('../modules/platform/platform.routes');

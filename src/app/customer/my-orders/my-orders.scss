@@ -1,19 +1,635 @@
+@use 'sass:color';
 @use '../../../styles/variables.scss' as *;
 
-.customer-my-orders {
-  padding: 24px;
-  
-  h1 {
-    font-family: $font-family-base;
-    font-size: 24px;
-    font-weight: 700;
-    color: $text-primary;
-    margin-bottom: 16px;
+.my-orders-page {
+  min-height: 100vh;
+  padding: 24px 16px;
+  background-color: #f5f5f5;
+
+  // Page Header
+  .page-header {
+    max-width: 800px;
+    margin: 0 0 32px auto;
+    text-align: right;
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: $text-primary;
+      margin: 0 0 8px 0;
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: $text-secondary;
+      margin: 0;
+    }
   }
 
-  p {
-    font-family: $font-family-base;
-    font-size: 16px;
-    color: $text-secondary;
+  // Loading State
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 24px;
+    text-align: center;
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #e0e0e0;
+      border-top-color: $primary-color;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    p {
+      font-size: 16px;
+      color: $text-secondary;
+      margin: 0;
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  // Error State
+  .error-state {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 24px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    text-align: center;
+
+    p {
+      font-size: 16px;
+      color: #d32f2f;
+      margin: 0;
+    }
+  }
+
+  // Empty State
+  .empty-state {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 64px 24px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    text-align: center;
+
+    .empty-icon {
+      color: #bdbdbd;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: $text-primary;
+      margin: 0 0 8px 0;
+    }
+
+    p {
+      font-size: 16px;
+      color: $text-secondary;
+      margin: 0;
+    }
+  }
+
+  // Order Content
+  .order-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  // Order Card
+  .order-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    padding: 32px 24px;
+
+    @media (max-width: 480px) {
+      padding: 24px 16px;
+    }
+  }
+
+  // Order Number Section
+  .order-number-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+    border-radius: 12px;
+    margin-bottom: 32px;
+
+    .label {
+      font-size: 15px;
+      font-weight: 500;
+      color: $text-secondary;
+    }
+
+    .number {
+      font-size: 18px;
+      font-weight: 700;
+      color: $primary-color;
+      font-family: 'Cairo', sans-serif;
+    }
+  }
+
+  // Status Timeline
+  .status-timeline {
+    margin-bottom: 32px;
+    padding: 0 12px;
+  }
+
+  .timeline-step {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding-bottom: 32px;
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+
+    // Icon Circle
+    .step-icon {
+      position: relative;
+      z-index: 2;
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e0e0e0;
+      color: #9e9e9e;
+      transition: all 0.3s ease;
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    // Connector Line
+    .step-connector {
+      position: absolute;
+      right: 19px;
+      top: 40px;
+      width: 2px;
+      height: calc(100% - 8px);
+      background: #e0e0e0;
+      transition: background-color 0.3s ease;
+    }
+
+    // Content
+    .step-content {
+      flex: 1;
+      padding-top: 8px;
+
+      .step-label {
+        font-size: 16px;
+        font-weight: 600;
+        color: #9e9e9e;
+        margin-bottom: 4px;
+        transition: color 0.3s ease;
+      }
+
+      .step-sublabel {
+        font-size: 14px;
+        color: #bdbdbd;
+        transition: color 0.3s ease;
+      }
+    }
+
+    // Completed State
+    &.completed {
+      .step-icon {
+        background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+      }
+
+      .step-connector {
+        background: linear-gradient(180deg, #4caf50 0%, #e0e0e0 100%);
+      }
+
+      .step-content {
+        .step-label {
+          color: $text-primary;
+        }
+
+        .step-sublabel {
+          color: #4caf50;
+          font-weight: 500;
+        }
+      }
+    }
+
+    // Current State
+    &.current {
+      .step-icon {
+        background: white;
+        color: $primary-color;
+        border: 3px solid $primary-color;
+        box-shadow: 0 4px 16px rgba(255, 193, 7, 0.3);
+        animation: pulse 2s ease-in-out infinite;
+
+        svg {
+          animation: rotate 1.5s linear infinite;
+        }
+      }
+
+      .step-content {
+        .step-label {
+          color: $text-primary;
+          font-weight: 700;
+        }
+
+        .step-sublabel {
+          color: $primary-color;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      box-shadow: 0 4px 16px rgba(255, 193, 7, 0.3);
+    }
+    50% {
+      box-shadow: 0 4px 24px rgba(255, 193, 7, 0.5);
+    }
+  }
+
+  @keyframes rotate {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  // Daily Goals Section
+  .daily-goals {
+    margin-bottom: 32px;
+    padding: 20px;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border-radius: 12px;
+    border: 1px solid #a5d6a7;
+
+    .goals-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+
+      .target-icon {
+        color: #2e7d32;
+      }
+
+      span {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2e7d32;
+      }
+    }
+
+    .goals-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .goal-card {
+      background: white;
+      padding: 16px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+
+      .goal-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #2e7d32;
+        margin-bottom: 4px;
+        font-family: 'Cairo', sans-serif;
+      }
+
+      .goal-label {
+        font-size: 14px;
+        color: #558b2f;
+        font-weight: 500;
+      }
+    }
+  }
+
+  // Order Details Section
+  .order-details {
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: $text-primary;
+      margin: 0 0 20px 0;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f5f5f5;
+    }
+
+    .meal-section {
+      margin-bottom: 24px;
+      padding: 16px;
+      background: #fafafa;
+      border-radius: 12px;
+      border: 1px solid #eeeeee;
+
+      .meal-section-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: $primary-color;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .meal-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: white;
+        border-radius: 8px;
+        margin-bottom: 8px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .meal-image {
+          width: 56px;
+          height: 56px;
+          border-radius: 8px;
+          object-fit: cover;
+          flex-shrink: 0;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .meal-info {
+          flex: 1;
+          min-width: 0;
+
+          .meal-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: $text-primary;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .meal-macros {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: $text-secondary;
+
+            span:nth-child(2) {
+              color: #bdbdbd;
+            }
+          }
+        }
+      }
+    }
+
+    // Snack Section (purple tint)
+    .snack-section {
+      padding: 16px;
+      background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+      border-radius: 12px;
+      border: 1px solid #ce93d8;
+
+      .meal-section-title {
+        color: #7b1fa2;
+        border-bottom-color: #ce93d8;
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #ce93d8;
+      }
+
+      .meal-row.snack {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #ce93d8;
+
+        .meal-image {
+          width: 56px;
+          height: 56px;
+          border-radius: 8px;
+          object-fit: cover;
+          flex-shrink: 0;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .meal-info {
+          flex: 1;
+          min-width: 0;
+
+          .meal-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: $text-primary;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .meal-macros {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: $text-secondary;
+          }
+        }
+      }
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: 600px) {
+    padding: 16px 12px;
+
+    .page-header {
+      margin-bottom: 24px;
+
+      .page-title {
+        font-size: 24px;
+      }
+
+      .page-subtitle {
+        font-size: 14px;
+      }
+    }
+
+    .order-card {
+      border-radius: 12px;
+    }
+
+    .order-number-section {
+      padding: 14px 16px;
+
+      .label {
+        font-size: 14px;
+      }
+
+      .number {
+        font-size: 16px;
+      }
+    }
+
+    .timeline-step {
+      gap: 12px;
+      padding-bottom: 28px;
+
+      .step-icon {
+        width: 36px;
+        height: 36px;
+
+        svg {
+          width: 18px;
+          height: 18px;
+        }
+      }
+
+      .step-connector {
+        right: 17px;
+        top: 36px;
+      }
+
+      .step-content {
+        padding-top: 6px;
+
+        .step-label {
+          font-size: 15px;
+        }
+
+        .step-sublabel {
+          font-size: 13px;
+        }
+      }
+    }
+
+    .daily-goals {
+      padding: 16px;
+
+      .goals-grid {
+        gap: 10px;
+      }
+
+      .goal-card {
+        padding: 14px;
+
+        .goal-value {
+          font-size: 22px;
+        }
+
+        .goal-label {
+          font-size: 13px;
+        }
+      }
+    }
+
+    .order-details {
+      .section-title {
+        font-size: 16px;
+      }
+
+      .meal-section {
+        padding: 12px;
+
+        .meal-section-title {
+          font-size: 14px;
+        }
+
+        .meal-row {
+          padding: 10px;
+
+          .meal-image {
+            width: 48px;
+            height: 48px;
+          }
+
+          .meal-info {
+            .meal-name {
+              font-size: 14px;
+            }
+
+            .meal-macros {
+              font-size: 12px;
+            }
+          }
+        }
+      }
+
+      .snack-section {
+        padding: 12px;
+
+        .meal-section-title {
+          font-size: 14px;
+        }
+
+        .meal-row.snack {
+          padding: 10px;
+
+          .meal-image {
+            width: 48px;
+            height: 48px;
+          }
+
+          .meal-info {
+            .meal-name {
+              font-size: 14px;
+            }
+
+            .meal-macros {
+              font-size: 12px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Desktop centered layout
+  @media (min-width: 768px) {
+    padding: 40px 24px;
+
+    .page-header {
+      margin-bottom: 40px;
+    }
+
+    .order-card {
+      padding: 40px 32px;
+    }
   }
 }
