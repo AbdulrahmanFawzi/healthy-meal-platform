@@ -38,6 +38,19 @@ const authRoutes = require('../modules/auth/auth.routes');
 router.use('/auth', authRoutes);
 
 /**
+ * Platform Routes
+ * ---------------
+ * Handles platform-level operations (super admin only).
+ * Base path: /api/platform
+ * 
+ * Available endpoints:
+ * - POST /api/platform/restaurants (create restaurant + admin)
+ * - GET /api/platform/restaurants (list all restaurants)
+ */
+const platformRoutes = require('../modules/platform/platform.routes');
+router.use('/platform', platformRoutes);
+
+/**
  * Meals Routes
  * ------------
  * Handles meal management (CRUD + image upload).
@@ -82,13 +95,25 @@ router.use('/orders', orderRoutes);
 const notificationRoutes = require('../modules/notifications/notification.routes');
 router.use('/notifications', notificationRoutes);
 
+/**
+ * Subscriptions Routes (Admin)
+ * ----------------------------
+ * Handles subscriber and subscription management.
+ * Base path: /api/admin/subscribers
+ * 
+ * Available endpoints:
+ * - POST /api/admin/subscribers (admin)
+ * - GET /api/admin/subscribers (admin)
+ * - GET /api/admin/subscribers/:id (admin)
+ * - PUT /api/admin/subscribers/:id (admin)
+ * - DELETE /api/admin/subscribers/:id (admin)
+ */
+const subscriptionRoutes = require('../modules/subscriptions/subscription.routes');
+router.use('/admin/subscribers', subscriptionRoutes);
+
 // ===========================
 // Future API Routes
 // ===========================
-
-// TODO: Mount subscriptions routes (restaurant-scoped)
-// const subscriptionsRoutes = require('../modules/subscriptions/subscriptions.routes');
-// router.use('/subscriptions', subscriptionsRoutes);
 
 // TODO: Mount platform routes (super_admin only)
 // const platformRoutes = require('../modules/platform/platform.routes');

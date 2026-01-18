@@ -67,6 +67,44 @@ async function getTodayOrders(restaurantId, filters = {}) {
     .sort({ createdAt: -1 })
     .lean();
 
+  // Populate subscription data for each order to get mealsPerDay and ensure macroTargets
+  const Subscription = require('../../models/subscription.model');
+  
+  for (const order of orders) {
+    // Find active subscription for this customer
+    const subscription = await Subscription.findOne({
+      restaurantId,
+      customerId: order.customerId._id,
+      status: 'active',
+      startDate: { $lte: new Date(order.orderDate) },
+      endDate: { $gte: new Date(order.orderDate) }
+    }).lean();
+
+    if (subscription) {
+      // Add mealsPerDay from subscription
+      order.mealsPerDay = subscription.plan.mealsPerDay;
+      
+      // Ensure macroTargets exists (use subscription macros if not set)
+      if (!order.macroTargets || !order.macroTargets.proteinGrams) {
+        order.macroTargets = {
+          proteinGrams: subscription.macros.proteinGrams,
+          carbsGrams: subscription.macros.carbsGrams
+        };
+      }
+    } else {
+      // Fallback: infer mealsPerDay from selections count
+      order.mealsPerDay = order.selections?.length || 0;
+      
+      // If macroTargets missing, use totals as targets (or set to 0)
+      if (!order.macroTargets) {
+        order.macroTargets = {
+          proteinGrams: 0,
+          carbsGrams: 0
+        };
+      }
+    }
+  }
+
   // Client-side search if query provided
   if (filters.q) {
     const searchLower = filters.q.toLowerCase();
@@ -88,6 +126,34 @@ async function getMyOrders(customerId, restaurantId) {
     .sort({ createdAt: -1 })
     .limit(30) // Last 30 orders
     .lean();
+
+  // Populate subscription data for each order
+  const Subscription = require('../../models/subscription.model');
+  
+  for (const order of orders) {
+    const subscription = await Subscription.findOne({
+      restaurantId,
+      customerId,
+      status: 'active',
+      startDate: { $lte: new Date(order.orderDate) },
+      endDate: { $gte: new Date(order.orderDate) }
+    }).lean();
+
+    if (subscription) {
+      order.mealsPerDay = subscription.plan.mealsPerDay;
+      if (!order.macroTargets || !order.macroTargets.proteinGrams) {
+        order.macroTargets = {
+          proteinGrams: subscription.macros.proteinGrams,
+          carbsGrams: subscription.macros.carbsGrams
+        };
+      }
+    } else {
+      order.mealsPerDay = order.selections?.length || 0;
+      if (!order.macroTargets) {
+        order.macroTargets = { proteinGrams: 0, carbsGrams: 0 };
+      }
+    }
+  }
 
   return orders;
 }
@@ -166,7 +232,35 @@ async function getCurrentOrder(customerId, restaurantId) {
     orderDate: today,
   })
     .sort({ createdAt: -1 }) // Latest first
-    .populate('customerId', 'name phone');
+    .populate('customerId', 'name phone')
+    .lean();
+
+  if (order) {
+    // Populate subscription data
+    const Subscription = require('../../models/subscription.model');
+    const subscription = await Subscription.findOne({
+      restaurantId,
+      customerId,
+      status: 'active',
+      startDate: { $lte: new Date(today) },
+      endDate: { $gte: new Date(today) }
+    }).lean();
+
+    if (subscription) {
+      order.mealsPerDay = subscription.plan.mealsPerDay;
+      if (!order.macroTargets || !order.macroTargets.proteinGrams) {
+        order.macroTargets = {
+          proteinGrams: subscription.macros.proteinGrams,
+          carbsGrams: subscription.macros.carbsGrams
+        };
+      }
+    } else {
+      order.mealsPerDay = order.selections?.length || 0;
+      if (!order.macroTargets) {
+        order.macroTargets = { proteinGrams: 0, carbsGrams: 0 };
+      }
+    }
+  }
 
   return order; // null if no order today
 }
@@ -181,7 +275,36 @@ async function getOrderHistory(customerId, restaurantId) {
     customerId,
   })
     .sort({ createdAt: -1 }) // Latest first
-    .populate('customerId', 'name phone');
+    .populate('customerId', 'name phone')
+    .lean();
+
+  // Populate subscription data for each order
+  const Subscription = require('../../models/subscription.model');
+  
+  for (const order of orders) {
+    const subscription = await Subscription.findOne({
+      restaurantId,
+      customerId,
+      status: 'active',
+      startDate: { $lte: new Date(order.orderDate) },
+      endDate: { $gte: new Date(order.orderDate) }
+    }).lean();
+
+    if (subscription) {
+      order.mealsPerDay = subscription.plan.mealsPerDay;
+      if (!order.macroTargets || !order.macroTargets.proteinGrams) {
+        order.macroTargets = {
+          proteinGrams: subscription.macros.proteinGrams,
+          carbsGrams: subscription.macros.carbsGrams
+        };
+      }
+    } else {
+      order.mealsPerDay = order.selections?.length || 0;
+      if (!order.macroTargets) {
+        order.macroTargets = { proteinGrams: 0, carbsGrams: 0 };
+      }
+    }
+  }
 
   return orders;
 }

@@ -1,8 +1,22 @@
 <header class="admin-header" dir="rtl">
   <div class="header-content">
-    <div class="logo-section">
-      <img [src]="restaurantLogoUrl" alt="Restaurant Logo" class="restaurant-logo">
-      <span class="admin-title">مدير النظام</span>
-    </div>
+    <!-- Hamburger Menu (mobile only) -->
+    <button class="hamburger-btn" (click)="onToggleSidebar()" [class.active]="isSidebarOpen">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+
+    @if (branding$ | async; as branding) {
+      <div class="logo-section">
+        <img [src]="brandingService.getLogoUrl(branding.logoUrl)" alt="Restaurant Logo" class="restaurant-logo">
+        <span class="admin-title">مدير نظام {{ branding.name }}</span>
+      </div>
+    } @else {
+      <div class="logo-section">
+        <img src="assets/healthyFoodIcon.png" alt="Logo" class="restaurant-logo">
+        <span class="admin-title">مدير النظام</span>
+      </div>
+    }
   </div>
 </header>

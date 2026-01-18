@@ -38,10 +38,11 @@ export interface Order {
     proteinGrams: number;
     carbsGrams: number;
   };
-  macroTargets?: {
+  macroTargets: {
     proteinGrams: number;
     carbsGrams: number;
   };
+  mealsPerDay: number; // Number of meals in subscription (1-5)
   notes?: string;
   createdAt: string;
   updatedAt: string;

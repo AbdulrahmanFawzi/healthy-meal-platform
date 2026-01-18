@@ -25,6 +25,16 @@ app.use(express.json());
 // Parse URL-encoded request bodies
 app.use(express.urlencoded({ extended: true }));
 
+// Ensure uploads directories exist
+const uploadsDir = path.join(__dirname, '../uploads');
+const restaurantsDir = path.join(uploadsDir, 'restaurants');
+if (!require('fs').existsSync(uploadsDir)) {
+  require('fs').mkdirSync(uploadsDir, { recursive: true });
+}
+if (!require('fs').existsSync(restaurantsDir)) {
+  require('fs').mkdirSync(restaurantsDir, { recursive: true });
+}
+
 // Serve uploaded images statically
 // Images accessible at: http://localhost:4000/uploads/filename.jpg
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));

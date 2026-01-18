@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { OrderDraftService } from '../services/order-draft.service';
+import { CustomerSubscriptionService, SubscriptionSettingsDto } from '../services/customer-subscription.service';
 import { OrdersService } from '../../core/services/orders.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { CreateOrderDto, MealSnapshot } from '../../core/models/order.model';
@@ -14,7 +15,8 @@ import { CreateOrderDto, MealSnapshot } from '../../core/models/order.model';
   styleUrl: './order-review.scss'
 })
 export class OrderReviewComponent implements OnInit {
-  // Daily goals (hardcoded for now, will come from subscription later)
+  // Subscription settings
+  subscriptionSettings: SubscriptionSettingsDto | null = null;
   proteinGoal = 120;
   carbsGoal = 150;
 
@@ -23,6 +25,7 @@ export class OrderReviewComponent implements OnInit {
 
   constructor(
     public orderDraft: OrderDraftService,
+    private subscriptionService: CustomerSubscriptionService,
     private ordersService: OrdersService,
     private toastService: ToastService,
     private router: Router
@@ -32,7 +35,28 @@ export class OrderReviewComponent implements OnInit {
     // Redirect if no order draft
     if (!this.orderDraft.isOrderComplete) {
       this.router.navigate(['/customer/home']);
+      return;
     }
+    
+    // Load subscription settings for macro targets
+    this.loadSubscriptionSettings();
+  }
+  
+  /**
+   * Load subscription settings
+   */
+  loadSubscriptionSettings(): void {
+    this.subscriptionService.getSubscriptionSettings().subscribe({
+      next: (settings) => {
+        this.subscriptionSettings = settings;
+        this.proteinGoal = settings.proteinTarget;
+        this.carbsGoal = settings.carbsTarget;
+      },
+      error: (err) => {
+        console.error('Error loading subscription settings:', err);
+        // Keep default values
+      }
+    });
   }
 
   /**
@@ -50,18 +74,15 @@ export class OrderReviewComponent implements OnInit {
 
     this.isSubmitting = true;
 
+    // Build selections array from dynamic meals
+    const selections = this.orderDraft.selections.map(meal => ({
+      proteinMeal: this.mapMealToSnapshot(meal.protein!),
+      carbMeal: this.mapMealToSnapshot(meal.carb!),
+    }));
+
     // Build order payload
     const orderData: CreateOrderDto = {
-      selections: [
-        {
-          proteinMeal: this.mapMealToSnapshot(this.orderDraft.selectedMeal1Protein!),
-          carbMeal: this.mapMealToSnapshot(this.orderDraft.selectedMeal1Carb!),
-        },
-        {
-          proteinMeal: this.mapMealToSnapshot(this.orderDraft.selectedMeal2Protein!),
-          carbMeal: this.mapMealToSnapshot(this.orderDraft.selectedMeal2Carb!),
-        }
-      ],
+      selections,
       totals: {
         calories: this.orderDraft.totalCalories,
         proteinGrams: this.orderDraft.totalProtein,

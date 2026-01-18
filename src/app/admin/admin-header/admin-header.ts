@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../core/auth/auth.service';
+import { RestaurantBrandingService } from '../../core/services/restaurant-branding.service';
+import { Observable } from 'rxjs';
+import { RestaurantBranding } from '../../core/services/restaurant-branding.service';
 
 @Component({
   selector: 'app-admin-header',
@@ -10,18 +12,22 @@ import { AuthService } from '../../core/auth/auth.service';
   styleUrl: './admin-header.scss'
 })
 export class AdminHeaderComponent implements OnInit {
-  restaurantLogoUrl: string = 'assets/healthyFoodIcon.png';
-  restaurantName: string = '';
+  @Input() isSidebarOpen = false;
+  @Output() toggleSidebar = new EventEmitter<void>();
+  
+  branding$: Observable<RestaurantBranding | null>;
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    public brandingService: RestaurantBrandingService
+  ) {
+    this.branding$ = this.brandingService.branding$;
+  }
 
   ngOnInit(): void {
-    const restaurant = this.authService.getRestaurant();
-    if (restaurant) {
-      this.restaurantName = restaurant.name;
-      if (restaurant.logoUrl) {
-        this.restaurantLogoUrl = restaurant.logoUrl;
-      }
-    }
+    // Branding is loaded in login component after successful authentication
+  }
+
+  onToggleSidebar(): void {
+    this.toggleSidebar.emit();
   }
 }

@@ -1,11 +1,22 @@
 <div class="admin-layout" dir="rtl">
   <!-- Sidebar (right side in RTL) -->
-  <app-admin-sidebar></app-admin-sidebar>
+  <app-admin-sidebar 
+    [isOpen]="isSidebarOpen"
+    (close)="closeSidebar()">
+  </app-admin-sidebar>
+
+  <!-- Backdrop (mobile only) -->
+  @if (isSidebarOpen) {
+    <div class="sidebar-backdrop" (click)="closeSidebar()"></div>
+  }
 
   <!-- Main Content Area -->
   <div class="admin-content">
     <!-- Header -->
-    <app-admin-header></app-admin-header>
+    <app-admin-header 
+      [isSidebarOpen]="isSidebarOpen"
+      (toggleSidebar)="toggleSidebar()">
+    </app-admin-header>
     
     <!-- Page Content (router-outlet for child routes) -->
     <main class="admin-main">

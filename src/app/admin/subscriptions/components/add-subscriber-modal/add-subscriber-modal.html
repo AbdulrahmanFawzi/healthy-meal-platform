@@ -1,0 +1,338 @@
+<!-- 
+  Add/Edit Subscriber Modal
+  
+  Matches meal form modal design pattern
+  Full-screen on mobile, centered popup on desktop
+-->
+
+<!-- Modal Backdrop -->
+<div class="modal-backdrop" (click)="onClose()"></div>
+
+<!-- Modal Container -->
+<div class="modal-container open">
+  <div class="modal-content" (click)="$event.stopPropagation(); closeAllDropdowns()">
+    
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h2 class="modal-title">
+        {{ subscriber ? 'تعديل المشترك' : 'إضافة مشترك جديد' }}
+      </h2>
+      <button 
+        type="button" 
+        class="close-btn" 
+        (click)="onClose()"
+        [disabled]="isSubmitting"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <form [formGroup]="subscriberForm" (ngSubmit)="onSubmit(); $event.preventDefault()" class="modal-body">
+      
+      <!-- Error Alert -->
+      @if (error) {
+        <div class="error-alert">
+          <svg class="error-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M12 8V12M12 16H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>{{ error }}</span>
+        </div>
+      }
+
+      <!-- SECTION 1: Account Information -->
+      <div class="form-section">
+        <h3 class="section-title">معلومات الحساب</h3>
+
+        <!-- Full Name -->
+        <div class="form-group">
+          <label for="fullName" class="form-label">
+            اسم المشترك <span class="required">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="fullName"
+            class="form-input" 
+            placeholder="مثال: أحمد محمد"
+            formControlName="fullName"
+            [class.error]="hasError('fullName')"
+          />
+          @if (hasError('fullName')) {
+            <span class="error-message">{{ getErrorMessage('fullName') }}</span>
+          }
+        </div>
+
+        <!-- Phone -->
+        <div class="form-group">
+          <label for="phone" class="form-label">
+            رقم الجوال <span class="required">*</span>
+          </label>
+          <input 
+            type="tel" 
+            id="phone"
+            class="form-input" 
+            placeholder="05XXXXXXXX"
+            formControlName="phone"
+            [class.error]="hasError('phone')"
+            maxlength="10"
+            dir="ltr"
+            style="text-align: right;"
+          />
+          @if (hasError('phone')) {
+            <span class="error-message">{{ getErrorMessage('phone') }}</span>
+          }
+        </div>
+
+        <!-- Email (Optional) -->
+        <div class="form-group">
+          <label for="email" class="form-label">
+            البريد الإلكتروني (اختياري)
+          </label>
+          <input 
+            type="email" 
+            id="email"
+            class="form-input" 
+            placeholder="example@domain.com"
+            formControlName="email"
+            [class.error]="hasError('email')"
+            dir="ltr"
+            style="text-align: right;"
+          />
+          @if (hasError('email')) {
+            <span class="error-message">{{ getErrorMessage('email') }}</span>
+          }
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password" class="form-label">
+            كلمة المرور 
+            @if (!subscriber) {
+              <span class="required">*</span>
+            }
+          </label>
+          <div class="password-input-wrapper">
+            <input 
+              [type]="showPassword ? 'text' : 'password'" 
+              id="password"
+              class="form-input password-input" 
+              [placeholder]="subscriber ? 'اتركه فارغاً إذا لا تريد تغييره' : 'أدخل كلمة المرور'"
+              formControlName="password"
+              [class.error]="hasError('password')"
+            />
+            <button 
+              type="button" 
+              class="password-toggle-btn"
+              (click)="togglePasswordVisibility()"
+              tabindex="-1"
+            >
+              @if (showPassword) {
+                <!-- Eye Icon - Password is visible -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              } @else {
+                <!-- Eye Slash Icon - Password is hidden -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              }
+            </button>
+          </div>
+          @if (hasError('password')) {
+            <span class="error-message">{{ getErrorMessage('password') }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="divider"></div>
+
+      <!-- SECTION 2: Subscription Details -->
+      <div class="form-section">
+        <h3 class="section-title">تفاصيل الاشتراك</h3>
+
+        <!-- Meals Per Day Dropdown -->
+        <div class="form-group">
+          <label class="form-label">
+            عدد الوجبات اليومية <span class="required">*</span>
+          </label>
+          <div class="custom-dropdown" [class.open]="isMealsDropdownOpen">
+            <div 
+              class="dropdown-trigger" 
+              (click)="toggleMealsDropdown($event)"
+              [class.error]="hasError('mealsPerDay')"
+            >
+              <span class="dropdown-label">{{ getSelectedMealsLabel() }}</span>
+              <svg class="dropdown-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+            @if (isMealsDropdownOpen) {
+              <div class="dropdown-panel" (click)="$event.stopPropagation()">
+                @for (option of mealsOptions; track option.value) {
+                  <div 
+                    class="dropdown-option"
+                    [class.selected]="subscriberForm.get('mealsPerDay')?.value === option.value"
+                    (click)="selectMealsPerDay(option.value)"
+                  >
+                    {{ option.label }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Macros Grid -->
+        <div class="macros-grid">
+          <!-- Daily Protein -->
+          <div class="form-group">
+            <label for="dailyProteinGram" class="form-label">
+              البروتين اليومي (جرام) <span class="required">*</span>
+            </label>
+            <input 
+              type="number" 
+              id="dailyProteinGram"
+              class="form-input" 
+              placeholder="150"
+              formControlName="dailyProteinGram"
+              [class.error]="hasError('dailyProteinGram')"
+              min="1"
+            />
+            @if (hasError('dailyProteinGram')) {
+              <span class="error-message">{{ getErrorMessage('dailyProteinGram') }}</span>
+            }
+          </div>
+
+          <!-- Daily Carbs -->
+          <div class="form-group">
+            <label for="dailyCarbsGram" class="form-label">
+              الكربوهيدرات اليومية (جرام) <span class="required">*</span>
+            </label>
+            <input 
+              type="number" 
+              id="dailyCarbsGram"
+              class="form-input" 
+              placeholder="200"
+              formControlName="dailyCarbsGram"
+              [class.error]="hasError('dailyCarbsGram')"
+              min="1"
+            />
+            @if (hasError('dailyCarbsGram')) {
+              <span class="error-message">{{ getErrorMessage('dailyCarbsGram') }}</span>
+            }
+          </div>
+        </div>
+
+        <!-- Include Snack Toggle -->
+        <div class="form-group">
+          <label class="toggle-label">
+            <input 
+              type="checkbox" 
+              class="toggle-input"
+              formControlName="includeSnack"
+            />
+            <span class="toggle-slider"></span>
+            <span class="toggle-text">تضمين وجبة خفيفة (اختيارية للعميل)</span>
+          </label>
+        </div>
+
+        <!-- Date Range -->
+        <div class="date-grid">
+          <!-- Start Date -->
+          <div class="form-group">
+            <label for="startDate" class="form-label">
+              تاريخ بداية الاشتراك <span class="required">*</span>
+            </label>
+            <input 
+              type="date" 
+              id="startDate"
+              class="form-input" 
+              formControlName="startDate"
+              [class.error]="hasError('startDate')"
+            />
+            @if (hasError('startDate')) {
+              <span class="error-message">{{ getErrorMessage('startDate') }}</span>
+            }
+          </div>
+
+          <!-- End Date -->
+          <div class="form-group">
+            <label for="endDate" class="form-label">
+              تاريخ نهاية الاشتراك <span class="required">*</span>
+            </label>
+            <input 
+              type="date" 
+              id="endDate"
+              class="form-input" 
+              formControlName="endDate"
+              [class.error]="hasError('endDate')"
+            />
+            @if (hasError('endDate')) {
+              <span class="error-message">{{ getErrorMessage('endDate') }}</span>
+            }
+          </div>
+        </div>
+
+        <!-- Status Dropdown -->
+        <div class="form-group">
+          <label class="form-label">
+            حالة الاشتراك <span class="required">*</span>
+          </label>
+          <div class="custom-dropdown" [class.open]="isStatusDropdownOpen">
+            <div 
+              class="dropdown-trigger" 
+              (click)="toggleStatusDropdown($event)"
+              [class.error]="hasError('status')"
+            >
+              <span class="dropdown-label">{{ getSelectedStatusLabel() }}</span>
+              <svg class="dropdown-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+            @if (isStatusDropdownOpen) {
+              <div class="dropdown-panel" (click)="$event.stopPropagation()">
+                @for (option of statusOptions; track option.value) {
+                  <div 
+                    class="dropdown-option"
+                    [class.selected]="subscriberForm.get('status')?.value === option.value"
+                    (click)="selectStatus(option.value)"
+                  >
+                    {{ option.label }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button 
+          type="button" 
+          class="btn btn-secondary"
+          (click)="onClose()"
+          [disabled]="isSubmitting"
+        >
+          إلغاء
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          [disabled]="isSubmitting || subscriberForm.invalid"
+        >
+          @if (isSubmitting) {
+            <span class="spinner"></span>
+          }
+          {{ subscriber ? 'حفظ التغييرات' : 'إضافة المشترك' }}
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</div>

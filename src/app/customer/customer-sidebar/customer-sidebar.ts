@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
+import { RestaurantBrandingService } from '../../core/services/restaurant-branding.service';
+import { Observable } from 'rxjs';
+import { RestaurantBranding } from '../../core/services/restaurant-branding.service';
 
 interface MenuItem {
   label: string;
@@ -17,7 +20,10 @@ interface MenuItem {
   styleUrl: './customer-sidebar.scss'
 })
 export class CustomerSidebarComponent implements OnInit {
-  restaurantLogoUrl: string = 'assets/healthyFoodIcon.png';
+  @Input() isOpen = false;
+  @Output() close = new EventEmitter<void>();
+  
+  branding$: Observable<RestaurantBranding | null>;
 
   menuItems: MenuItem[] = [
     { label: 'الرئيسية', icon: 'assets/home-icon.svg', route: '/customer/home' },
@@ -40,7 +46,13 @@ export class CustomerSidebarComponent implements OnInit {
   remainingDays: number = 0;
   progressPercent: number = 0;
 
-  constructor(public router: Router, private authService: AuthService) {}
+  constructor(
+    public router: Router,
+    private authService: AuthService,
+    public brandingService: RestaurantBrandingService
+  ) {
+    this.branding$ = this.brandingService.branding$;
+  }
 
   ngOnInit(): void {
     this.calculateSubscriptionStatus();
@@ -95,6 +107,13 @@ export class CustomerSidebarComponent implements OnInit {
       return 'status-yellow';
     } else {
       return 'status-green';
+    }
+  }
+
+  onNavItemClick(): void {
+    // Close sidebar on mobile when nav item is clicked
+    if (window.innerWidth <= 768) {
+      this.close.emit();
     }
   }
 

@@ -9,11 +9,10 @@
 
   <!-- Shared centered content container -->
   <div class="orders-content">
-    <!-- Filters Toolbar Card -->
-    <div class="filters-toolbar-card" (click)="closeStatusDropdown()">
-    <div class="toolbar-content">
-      <!-- Search Input (First/Right side in RTL) -->
-      <div class="search-wrapper">
+    <!-- Filters Toolbar (Simple Flex Layout) -->
+    <div class="filters-toolbar">
+      <!-- Search Input (RIGHT side in RTL) -->
+      <div class="toolbar-search">
         <input
           type="text"
           class="search-input"
@@ -26,8 +25,8 @@
         </svg>
       </div>
 
-      <!-- Status Filter (Second/Left side in RTL) -->
-      <div class="filter-wrapper">
+      <!-- Filter Dropdown (LEFT side in RTL) -->
+      <div class="toolbar-filter">
         <div 
           class="custom-dropdown" 
           [class.open]="isStatusDropdownOpen"
@@ -37,35 +36,35 @@
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
           <span class="dropdown-label">{{ getSelectedStatusLabel() }}</span>
-          @if (isStatusDropdownOpen) {
-            <div class="dropdown-panel" (click)="$event.stopPropagation()">
-              @for (option of statusOptions; track option.value) {
-                <div 
-                  class="dropdown-option"
-                  [class.selected]="selectedStatus === option.value"
-                  (click)="selectStatus($any(option.value))"
-                >
-                  {{ option.label }}
-                </div>
-              }
-            </div>
-          }
         </div>
+        
+        @if (isStatusDropdownOpen) {
+          <div class="dropdown-panel" (click)="$event.stopPropagation()">
+            @for (option of statusOptions; track option.value) {
+              <div 
+                class="dropdown-option"
+                [class.selected]="selectedStatus === option.value"
+                (click)="selectStatus($any(option.value))"
+              >
+                {{ option.label }}
+              </div>
+            }
+          </div>
+        }
       </div>
     </div>
-  </div>
 
-  <!-- Loading State -->
-  @if (isLoading) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>جاري تحميل الطلبات...</p>
-    </div>
-  }
+    <!-- Loading State -->
+    @if (isLoading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>جاري تحميل الطلبات...</p>
+      </div>
+    }
 
-  <!-- Orders List -->
-  @if (!isLoading && orders.length > 0) {
-    <div class="orders-list">
+    <!-- Orders List -->
+    @if (!isLoading && orders.length > 0) {
+      <div class="orders-list">
       @for (order of orders; track trackByOrderId($index, order)) {
         <div class="order-card">
           <!-- Card Header -->

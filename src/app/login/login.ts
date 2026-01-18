@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../core/auth/auth.service';
+import { RestaurantBrandingService } from '../core/services/restaurant-branding.service';
+import { toInternationalFormat } from '../core/utils/phone.util';
 
 @Component({
   selector: 'app-login',
@@ -20,13 +22,14 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private brandingService: RestaurantBrandingService
   ) {
     // Initialize login form with validation rules
     this.loginForm = this.fb.group({
       phone: ['', [
         Validators.required,
-        Validators.pattern(/^\+9665\d{8}$/)  // Saudi phone: +966 5XXXXXXXX
+        Validators.pattern(/^05[0-9]{8}$/)  // Saudi phone: 05XXXXXXXX (10 digits)
       ]],
       password: ['', [
         Validators.required,
@@ -56,12 +59,27 @@ export class LoginComponent {
     this.errorMessage = '';
     this.isLoading = true;
 
+    // Convert phone to international format before sending to backend
+    const loginPayload = {
+      phone: toInternationalFormat(this.loginForm.value.phone),
+      password: this.loginForm.value.password
+    };
+
     // Attempt login via AuthService
-    this.authService.login(this.loginForm.value).subscribe({
+    this.authService.login(loginPayload).subscribe({
       next: (response) => {
-        this.isLoading = false;
-        // Navigation handled by AuthService based on user role
-        console.log('Login successful:', response);
+        // Load restaurant branding after successful login
+        this.brandingService.loadBranding().subscribe({
+          next: () => {
+            this.isLoading = false;
+            // Navigation handled by AuthService based on user role
+            console.log('Login successful:', response);
+          },
+          error: (err) => {
+            console.warn('Failed to load branding, but login succeeded:', err);
+            this.isLoading = false;
+          }
+        });
       },
       error: (error) => {
         this.isLoading = false;

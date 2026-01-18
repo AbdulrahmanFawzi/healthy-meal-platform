@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { MealsService } from '../../core/services/meals.service';
 import { Meal, MealCategory } from '../../core/models/meal.model';
 import { OrderDraftService } from '../services/order-draft.service';
+import { CustomerSubscriptionService, SubscriptionSettingsDto } from '../services/customer-subscription.service';
 
 @Component({
   selector: 'app-customer-home',
@@ -13,42 +14,78 @@ import { OrderDraftService } from '../services/order-draft.service';
   styleUrl: './home.scss'
 })
 export class CustomerHomeComponent implements OnInit {
-  // Header card data
-  dailyGoals = '120g بروتين · 150g كارب';
+  // Subscription settings (loaded from API)
+  subscriptionSettings: SubscriptionSettingsDto | null = null;
+  dailyGoals = '';
+  
+  // Dynamic meal configuration
+  totalMeals = 2; // Default, updated from subscription
+  snackIncluded = false; // Updated from subscription
 
   // Meal lists
   proteinMeals: Meal[] = [];
   carbMeals: Meal[] = [];
   snackMeals: Meal[] = [];
   
-  // Current step: 1 = meal 1, 2 = meal 2, 3 = snack
-  currentStep = 1;
-  currentMealIndex = 1; // 1 or 2 (for meal steps)
+  // Current step: 0-based index for meal, or snack step
+  currentMealIndex = 0; // 0 to totalMeals-1
+  isSnackStep = false;
   
   // Loading states
   loadingProtein = false;
   loadingCarb = false;
   loadingSnack = false;
+  loadingSettings = false;
   
   // Error states
   errorProtein = '';
   errorCarb = '';
   errorSnack = '';
+  errorSettings = '';
 
   constructor(
     private mealsService: MealsService,
+    private subscriptionService: CustomerSubscriptionService,
     public orderDraft: OrderDraftService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    // Reset draft on component init
-    this.orderDraft.reset();
-    this.loadProteinMeals();
+    // Load subscription settings first
+    this.loadSubscriptionSettings();
+  }
+  
+  /**
+   * Load subscription settings to drive UI
+   */
+  loadSubscriptionSettings(): void {
+    this.loadingSettings = true;
+    this.errorSettings = '';
+    
+    this.subscriptionService.getSubscriptionSettings().subscribe({
+      next: (settings) => {
+        this.subscriptionSettings = settings;
+        this.totalMeals = settings.mealsPerDay;
+        this.snackIncluded = settings.snackIncluded;
+        this.dailyGoals = this.subscriptionService.formatDailyGoals(settings);
+        
+        // Initialize order draft with correct meal count
+        this.orderDraft.initSelections(this.totalMeals);
+        
+        // Load protein meals for first meal
+        this.loadProteinMeals();
+        this.loadingSettings = false;
+      },
+      error: (err) => {
+        this.errorSettings = 'فشل تحميل بيانات الاشتراك';
+        this.loadingSettings = false;
+        console.error('Error loading subscription settings:', err);
+      }
+    });
   }
 
   /**
-   * Computed: Progress percentage text (dynamic)
+   * Computed: Progress percentage text
    */
   get progressPercentage(): string {
     return `${Math.round(this.progressValue)}%`;
@@ -56,84 +93,86 @@ export class CustomerHomeComponent implements OnInit {
 
   /**
    * Computed: Progress value (0-100) based on completed selections
+   * Each meal requires 2 selections (protein + carb)
+   * Snack is NOT counted in progress
    */
   get progressValue(): number {
-    let completed = 0;
-    if (this.orderDraft.selectedMeal1Protein) completed++;
-    if (this.orderDraft.selectedMeal1Carb) completed++;
-    if (this.orderDraft.selectedMeal2Protein) completed++;
-    if (this.orderDraft.selectedMeal2Carb) completed++;
-    return (completed / 4) * 100;
+    const totalRequired = this.totalMeals * 2; // protein + carb for each meal
+    const completed = this.orderDraft.completedSelectionsCount;
+    return (completed / totalRequired) * 100;
   }
 
   /**
-   * Computed: Meal label for header
+   * Computed: Meal label for header (1-based for display)
    */
   get mealLabel(): string {
-    if (this.currentStep === 3) return 'وجبة خفيفة (اختيارية)';
-    return this.currentMealIndex === 1 ? 'الوجبة 1 من 2' : 'الوجبة 2 من 2';
+    if (this.isSnackStep) return 'وجبة خفيفة (اختيارية)';
+    return `الوجبة ${this.currentMealIndex + 1} من ${this.totalMeals}`;
   }
 
   /**
    * Computed: Currently selected protein for active meal
    */
   get selectedProtein(): Meal | null {
-    return this.currentMealIndex === 1 
-      ? this.orderDraft.selectedMeal1Protein 
-      : this.orderDraft.selectedMeal2Protein;
+    const selection = this.orderDraft.getMealSelection(this.currentMealIndex);
+    return selection ? selection.protein : null;
   }
 
   /**
    * Computed: Currently selected carb for active meal
    */
   get selectedCarb(): Meal | null {
-    return this.currentMealIndex === 1 
-      ? this.orderDraft.selectedMeal1Carb 
-      : this.orderDraft.selectedMeal2Carb;
+    const selection = this.orderDraft.getMealSelection(this.currentMealIndex);
+    return selection ? selection.carb : null;
   }
 
   /**
-   * Computed: Is meal 1 complete
+   * Computed: Is current meal complete
    */
-  get isMeal1Complete(): boolean {
-    return this.orderDraft.selectedMeal1Protein !== null && 
-           this.orderDraft.selectedMeal1Carb !== null;
+  get isCurrentMealComplete(): boolean {
+    return this.orderDraft.isMealComplete(this.currentMealIndex);
   }
 
   /**
-   * Computed: Is meal 2 complete
+   * Computed: Is on last meal
    */
-  get isMeal2Complete(): boolean {
-    return this.orderDraft.selectedMeal2Protein !== null && 
-           this.orderDraft.selectedMeal2Carb !== null;
+  get isLastMeal(): boolean {
+    return this.currentMealIndex === this.totalMeals - 1;
   }
 
   /**
    * Computed: Show next meal button
    */
   get showNextMealButton(): boolean {
-    return this.isMeal1Complete && this.currentStep === 1;
+    return this.isCurrentMealComplete && !this.isLastMeal;
   }
 
   /**
-   * Computed: Show snack button
+   * Computed: Show snack button (only if subscription includes snack and on last meal)
    */
   get showSnackButton(): boolean {
-    return this.isMeal2Complete && this.currentStep === 2;
+    return this.isCurrentMealComplete && this.isLastMeal && this.snackIncluded;
+  }
+  
+  /**
+   * Computed: Show review button (skip snack - when on last meal and no snack)
+   */
+  get showReviewButton(): boolean {
+    return this.isCurrentMealComplete && this.isLastMeal && !this.snackIncluded;
   }
 
   /**
-   * Computed: Show meal 2 action buttons (back and snack)
+   * Computed: Show meal action buttons (back and next/snack/review)
    */
-  get showMeal2ActionButtons(): boolean {
-    return this.isMeal2Complete && this.currentStep === 2;
+  get showMealActionButtons(): boolean {
+    return this.isCurrentMealComplete;
   }
 
   /**
-   * Computed: Is on snack step
+   * Computed: Can go back (not on first meal or on snack step)
    */
-  get isSnackStep(): boolean {
-    return this.currentStep === 3;
+  get canGoBack(): boolean {
+    return this.currentMealIndex > 0 || this.isSnackStep;
   }
 
   /**
@@ -209,13 +248,7 @@ export class CustomerHomeComponent implements OnInit {
    * Select protein
    */
   selectProtein(meal: Meal): void {
-    if (this.currentMealIndex === 1) {
-      this.orderDraft.selectedMeal1Protein = meal;
-      this.orderDraft.selectedMeal1Carb = null;
-    } else {
-      this.orderDraft.selectedMeal2Protein = meal;
-      this.orderDraft.selectedMeal2Carb = null;
-    }
+    this.orderDraft.setProtein(this.currentMealIndex, meal);
     this.loadCarbMeals();
   }
 
@@ -223,11 +256,7 @@ export class CustomerHomeComponent implements OnInit {
    * Select carb
    */
   selectCarb(meal: Meal): void {
-    if (this.currentMealIndex === 1) {
-      this.orderDraft.selectedMeal1Carb = meal;
-    } else {
-      this.orderDraft.selectedMeal2Carb = meal;
-    }
+    this.orderDraft.setCarb(this.currentMealIndex, meal);
   }
 
   /**
@@ -240,20 +269,27 @@ export class CustomerHomeComponent implements OnInit {
   }
 
   /**
-   * Proceed to meal 2
+   * Proceed to next meal
    */
-  proceedToMeal2(): void {
-    this.currentMealIndex = 2;
-    this.currentStep = 2;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  proceedToNextMeal(): void {
+    if (!this.isLastMeal) {
+      this.currentMealIndex++;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   /**
-   * Go back to meal 1
+   * Go back to previous meal
    */
-  goBackToMeal1(): void {
-    this.currentMealIndex = 1;
-    this.currentStep = 1;
+  goBackToPreviousMeal(): void {
+    if (this.isSnackStep) {
+      // Return to last meal from snack step
+      this.isSnackStep = false;
+      this.currentMealIndex = this.totalMeals - 1;
+    } else if (this.currentMealIndex > 0) {
+      // Go to previous meal
+      this.currentMealIndex--;
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -261,7 +297,7 @@ export class CustomerHomeComponent implements OnInit {
    * Proceed to snack step
    */
   proceedToSnack(): void {
-    this.currentStep = 3;
+    this.isSnackStep = true;
     this.loadSnackMeals();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -271,6 +307,14 @@ export class CustomerHomeComponent implements OnInit {
    */
   skipSnack(): void {
     this.orderDraft.selectedSnack = null;
+    this.orderDraft.snackSkipped = true;
+    this.router.navigate(['/customer/order-review']);
+  }
+  
+  /**
+   * Go directly to order review (when snack not included)
+   */
+  proceedToReview(): void {
     this.router.navigate(['/customer/order-review']);
   }
 

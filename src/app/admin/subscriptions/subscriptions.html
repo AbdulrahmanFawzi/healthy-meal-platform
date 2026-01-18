@@ -1,4 +1,202 @@
+<!-- 
+  Subscriptions Management Page (Admin)
+  
+  Lists subscriber cards with CRUD operations
+  Matches menu management design pattern
+-->
+
 <div class="page-container" dir="rtl">
-  <h1 class="page-title">الاشتراكات</h1>
-  <p class="page-subtitle">إدارة اشتراكات العملاء والخطط</p>
+  
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">الاشتراكات</h1>
+      <p class="page-subtitle">إدارة العملاء المشتركين</p>
+    </div>
+    
+    <!-- Add Subscriber Button (LEFT side in RTL) -->
+    <button 
+      type="button" 
+      class="add-subscriber-btn"
+      (click)="openAddSubscriberModal()"
+    >
+      <span class="btn-icon">+</span>
+      <span class="btn-text">إضافة مشترك جديد</span>
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  @if (isInitialLoading) {
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">جاري تحميل المشتركين...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error && !isInitialLoading) {
+    <div class="error-container">
+      <p class="error-message">{{ error }}</p>
+      <button 
+        type="button" 
+        class="retry-btn"
+        (click)="loadSubscribers()"
+      >
+        إعادة المحاولة
+      </button>
+    </div>
+  }
+
+  <!-- Subscribers Grid -->
+  @if (!isInitialLoading && !error) {
+    @if (subscribers.length > 0) {
+      <div class="subscribers-grid">
+        @for (subscriber of subscribers; track subscriber.id) {
+          <div class="subscriber-card">
+            
+            <!-- Card Header -->
+            <div class="card-header">
+              <div class="subscriber-info">
+                <h3 class="subscriber-name">{{ subscriber.fullName }}</h3>
+                <p class="subscriber-username">{{ subscriber.username }}</p>
+              </div>
+              <span 
+                class="status-pill" 
+                [ngClass]="getStatusClass(subscriber.status)"
+              >
+                {{ getStatusText(subscriber.status) }}
+              </span>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="contact-info">
+              <div class="contact-item">
+                <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M13.3333 11.8V13.4667C13.3333 13.8203 13.1929 14.1594 12.9428 14.4095C12.6928 14.6595 12.3536 14.8 12 14.8C9.57778 14.64 7.24444 13.7467 5.28889 12.2067C3.46667 10.78 2.05556 8.92 1.2 6.77333C0 4.77333 0 2.54 1.2 0.54C1.2 0.186667 1.34074 -0.152381 1.59079 -0.402381C1.84084 -0.652381 2.18074 -0.793333 2.53333 -0.793333H4.2C4.85333 -0.793333 5.4 -0.273333 5.46667 0.373333C5.52593 1.00667 5.66667 1.63333 5.88889 2.24C6.04444 2.66667 5.95556 3.14 5.64444 3.48L4.93333 4.19333C6.03704 6.07333 7.73333 7.77333 9.61333 8.87333L10.3267 8.16C10.6667 7.84667 11.14 7.76 11.5667 7.91333C12.1733 8.13333 12.8 8.27333 13.4333 8.33333C14.0867 8.4 14.6067 8.96 14.6067 9.62V11.28C14.6067 11.28 14.6067 11.54 14.6067 11.8C14.6067 11.8 13.3333 11.8 13.3333 11.8Z" fill="#6B7280"/>
+                </svg>
+                <span class="contact-text">{{ subscriber.phone }}</span>
+              </div>
+              @if (subscriber.email) {
+                <div class="contact-item">
+                  <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M2.66667 2.66667H13.3333C14.0667 2.66667 14.6667 3.26667 14.6667 4V12C14.6667 12.7333 14.0667 13.3333 13.3333 13.3333H2.66667C1.93333 13.3333 1.33333 12.7333 1.33333 12V4C1.33333 3.26667 1.93333 2.66667 2.66667 2.66667Z" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14.6667 4L8 8.66667L1.33333 4" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span class="contact-text">{{ subscriber.email }}</span>
+                </div>
+              }
+            </div>
+
+            <!-- Subscription Details -->
+            <div class="subscription-details">
+              <div class="detail-row">
+                <span class="detail-label">عدد الوجبات اليومية:</span>
+                <span class="detail-value">{{ subscriber.mealsPerDay }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">البروتين اليومي:</span>
+                <span class="detail-value">{{ subscriber.dailyProteinGram }}g</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">الكربوهيدرات اليومية:</span>
+                <span class="detail-value">{{ subscriber.dailyCarbsGram }}g</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">وجبة خفيفة:</span>
+                <span class="detail-value">{{ subscriber.includeSnack ? 'نعم' : 'لا' }}</span>
+              </div>
+            </div>
+
+            <!-- Subscription Period -->
+            <div class="subscription-period">
+              <div class="period-item">
+                <span class="period-label">من:</span>
+                <span class="period-date">{{ formatDate(subscriber.startDate) }}</span>
+              </div>
+              <div class="period-item">
+                <span class="period-label">إلى:</span>
+                <span class="period-date">{{ formatDate(subscriber.endDate) }}</span>
+              </div>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="card-footer">
+              <div class="footer-info">
+                <span class="member-since">عضو منذ {{ formatDate(subscriber.createdAt) }}</span>
+                <span class="total-orders">إجمالي الطلبات: {{ subscriber.totalOrdersCount }}</span>
+              </div>
+              <div class="card-actions">
+                <button 
+                  type="button" 
+                  class="action-btn edit-btn"
+                  (click)="onEditSubscriber(subscriber)"
+                  title="تعديل"
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M11.3333 2.00004C11.5084 1.82494 11.7163 1.68605 11.9451 1.59129C12.1739 1.49653 12.4191 1.44775 12.6667 1.44775C12.9142 1.44775 13.1594 1.49653 13.3882 1.59129C13.617 1.68605 13.8249 1.82494 14 2.00004C14.1751 2.17513 14.314 2.383 14.4088 2.61182C14.5035 2.84064 14.5523 3.08584 14.5523 3.33337C14.5523 3.58091 14.5035 3.82611 14.4088 4.05493C14.314 4.28375 14.1751 4.49162 14 4.66671L5.00001 13.6667L1.33334 14.6667L2.33334 11L11.3333 2.00004Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <button 
+                  type="button" 
+                  class="action-btn delete-btn"
+                  (click)="onDeleteSubscriber(subscriber)"
+                  title="حذف"
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M2 4H3.33333H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M5.33333 4V2.66667C5.33333 2.31304 5.47381 1.97391 5.72386 1.72386C5.97391 1.47381 6.31304 1.33333 6.66667 1.33333H9.33333C9.68696 1.33333 10.0261 1.47381 10.2761 1.72386C10.5262 1.97391 10.6667 2.31304 10.6667 2.66667V4M12.6667 4V13.3333C12.6667 13.687 12.5262 14.0261 12.2761 14.2761C12.0261 14.5262 11.687 14.6667 11.3333 14.6667H4.66667C4.31304 14.6667 3.97391 14.5262 3.72386 14.2761C3.47381 14.0261 3.33333 13.687 3.33333 13.3333V4H12.6667Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Empty State -->
+      <div class="empty-state">
+        <svg class="empty-icon" width="64" height="64" viewBox="0 0 24 24" fill="none">
+          <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="#D1D5DB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="#D1D5DB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13" stroke="#D1D5DB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88" stroke="#D1D5DB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3 class="empty-title">لا يوجد مشتركون بعد</h3>
+        <p class="empty-text">ابدأ بإضافة مشترك جديد</p>
+        <button 
+          type="button" 
+          class="add-first-subscriber-btn"
+          (click)="openAddSubscriberModal()"
+        >
+          + إضافة أول مشترك
+        </button>
+      </div>
+    }
+  }
+
 </div>
+
+<!-- Add/Edit Subscriber Modal -->
+@if (isModalOpen) {
+  <app-add-subscriber-modal
+    [subscriber]="editingSubscriber"
+    (close)="onModalClose()"
+    (saved)="onSubscriberSaved()"
+  ></app-add-subscriber-modal>
+}
+
+<!-- Confirmation Modal -->
+@if (isConfirmationOpen && subscriberToDelete) {
+  <app-confirmation-modal
+    [isOpen]="isConfirmationOpen"
+    [title]="'تأكيد إيقاف الاشتراك'"
+    [message]="'هل أنت متأكد من إيقاف اشتراك ' + subscriberToDelete.fullName + '؟ سيتم تعيين حالة الاشتراك إلى متوقف مؤقتاً.'"
+    [confirmText]="'إيقاف الاشتراك'"
+    [cancelText]="'إلغاء'"
+    [type]="'danger'"
+    (confirm)="confirmDelete()"
+    (cancel)="cancelDelete()"
+  ></app-confirmation-modal>
+}
+

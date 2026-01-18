@@ -200,66 +200,25 @@ const login = async (req, res) => {
  * 
  * Educational Purpose:
  * --------------------
- * Handles GET /api/auth/me endpoint.
- * Returns current user's profile based on JWT token.
+ * Returns current user's profile and restaurant data.
+ * Used after login to load/refresh user context.
  * 
- * HTTP Request:
- * -------------
- * GET /api/auth/me
- * Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ * Security:
+ * ---------
+ * userId is extracted from verified JWT by authMiddleware.
+ * User can only access their own profile.
  * 
- * Middleware Chain:
- * -----------------
- * authMiddleware → getCurrentUser()
- *      ↓               ↓
- * req.user = {...}  Use req.user.userId
- * 
- * HTTP Response:
- * --------------
- * 200 OK
- * {
- *   "success": true,
- *   "data": {
- *     "user": { ... },
- *     "restaurant": { ... }
- *   }
- * }
- * 
- * Use Cases:
- * ----------
- * - Frontend verifies token on app load
- * - User updates profile, frontend refreshes data
- * - Periodic token validation
- * 
- * @param {Object} req - Express request object (has req.user from authMiddleware)
- * @param {Object} res - Express response object
+ * @param {Object} req - Express request (with req.user from JWT)
+ * @param {Object} res - Express response
  */
 const getCurrentUser = async (req, res) => {
   try {
-    /**
-     * Extract User ID from JWT
-     * ------------------------
-     * authMiddleware has verified token and set req.user.
-     * We use userId from JWT (trusted source) not user input.
-     */
-    const userId = req.user.userId;
+    const result = await authService.getCurrentUser(req.user.userId);
     
-    /**
-     * Call Service Layer
-     * ------------------
-     * Get user profile with restaurant data.
-     */
-    const result = await authService.getCurrentUser(userId);
-    
-    /**
-     * Send Success Response
-     * ---------------------
-     */
     return res.status(200).json({
       success: true,
       data: result
     });
-    
   } catch (error) {
     const statusCode = error.statusCode || 500;
     const errorCode = error.code || 'SERVER_ERROR';

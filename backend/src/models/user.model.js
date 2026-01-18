@@ -1,6 +1,7 @@
 
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const { normalizePhone } = require('../utils/phone.util');
 
 const userSchema = new mongoose.Schema({
   /**
@@ -78,10 +79,13 @@ const userSchema = new mongoose.Schema({
     trim: true,
     validate: {
       validator: function(v) {
-        // Strict Saudi mobile format: +9665XXXXXXXX
-        return /^\+9665\d{8}$/.test(v);
+        // Accept both formats for backward compatibility:
+        // 1. Local: 05XXXXXXXX
+        // 2. International: +9665XXXXXXXX
+        const cleaned = v ? v.trim().replace(/\s/g, '') : '';
+        return /^05[0-9]{8}$/.test(cleaned) || /^\+9665[0-9]{8}$/.test(cleaned);
       },
-      message: 'رقم الجوال يجب أن يكون بصيغة +9665XXXXXXXX'
+      message: 'رقم الجوال يجب أن يكون بصيغة 05XXXXXXXX أو +9665XXXXXXXX'
     }
   },
 
@@ -197,6 +201,21 @@ const userSchema = new mongoose.Schema({
  * NOT on user identity.
  */
 
+
+/**
+ * ============================================
+ * PRE-SAVE HOOK: Phone Normalization
+ * ============================================
+ * 
+ * Normalize phone to international format before saving
+ * Ensures all phones stored as +9665XXXXXXXX
+ */
+userSchema.pre('save', async function() {
+  // Normalize phone if it's new or modified
+  if (this.isModified('phone')) {
+    this.phone = normalizePhone(this.phone);
+  }
+});
 
 /**
  * ============================================

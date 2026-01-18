@@ -1,0 +1,150 @@
+<div class="super-admin-page" dir="rtl">
+  <div class="page-container">
+    <h1 class="page-title">إدارة المطاعم</h1>
+    <p class="page-subtitle">إضافة مطعم جديد مع حساب مدير</p>
+
+    <!-- Success Message -->
+    @if (successMessage) {
+      <div class="alert alert-success">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#10B981" stroke-width="2"/>
+          <path d="M8 12l2 2 4-4" stroke="#10B981" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>{{ successMessage }}</span>
+      </div>
+    }
+
+    <!-- Error Message -->
+    @if (errorMessage) {
+      <div class="alert alert-error">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#EF4444" stroke-width="2"/>
+          <path d="M12 8v4M12 16h.01" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+    }
+
+    <!-- Create Restaurant Form -->
+    <div class="form-card">
+      <h2 class="form-title">إنشاء مطعم جديد</h2>
+      
+      <form [formGroup]="restaurantForm" (ngSubmit)="onSubmit()">
+        <!-- Restaurant Name -->
+        <div class="form-group">
+          <label for="restaurantName" class="form-label">اسم المطعم *</label>
+          <input
+            type="text"
+            id="restaurantName"
+            formControlName="restaurantName"
+            class="form-input"
+            placeholder="مثال: مطعم الصحة"
+          />
+          @if (restaurantForm.get('restaurantName')?.touched && restaurantForm.get('restaurantName')?.hasError('required')) {
+            <span class="error-text">اسم المطعم مطلوب</span>
+          }
+          @if (restaurantForm.get('restaurantName')?.touched && restaurantForm.get('restaurantName')?.hasError('minlength')) {
+            <span class="error-text">الاسم يجب أن يكون 3 أحرف على الأقل</span>
+          }
+        </div>
+
+        <!-- Admin Phone -->
+        <div class="form-group">
+          <label for="adminPhone" class="form-label">رقم جوال المدير *</label>
+          <input
+            type="tel"
+            id="adminPhone"
+            formControlName="adminPhone"
+            class="form-input"
+            placeholder="05xxxxxxxx أو +9665xxxxxxxx"
+            dir="ltr"
+          />
+          @if (restaurantForm.get('adminPhone')?.touched && restaurantForm.get('adminPhone')?.hasError('required')) {
+            <span class="error-text">رقم الجوال مطلوب</span>
+          }
+          @if (restaurantForm.get('adminPhone')?.touched && restaurantForm.get('adminPhone')?.hasError('pattern')) {
+            <span class="error-text">صيغة رقم الجوال غير صحيحة</span>
+          }
+        </div>
+
+        <!-- Admin Password -->
+        <div class="form-group">
+          <label for="adminPassword" class="form-label">كلمة مرور المدير *</label>
+          <input
+            type="password"
+            id="adminPassword"
+            formControlName="adminPassword"
+            class="form-input"
+            placeholder="كلمة المرور (6 أحرف على الأقل)"
+          />
+          @if (restaurantForm.get('adminPassword')?.touched && restaurantForm.get('adminPassword')?.hasError('required')) {
+            <span class="error-text">كلمة المرور مطلوبة</span>
+          }
+          @if (restaurantForm.get('adminPassword')?.touched && restaurantForm.get('adminPassword')?.hasError('minlength')) {
+            <span class="error-text">كلمة المرور يجب أن تكون 6 أحرف على الأقل</span>
+          }
+        </div>
+
+        <!-- Logo Upload -->
+        <div class="form-group">
+          <label for="logo" class="form-label">شعار المطعم (اختياري)</label>
+          <input
+            type="file"
+            id="logo"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            class="form-input-file"
+          />
+          <p class="form-hint">PNG, JPG, GIF - حجم أقصى 5MB</p>
+          @if (selectedFile) {
+            <p class="selected-file">✓ تم اختيار: {{ selectedFile.name }}</p>
+          }
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="submit-btn"
+          [disabled]="isSubmitting"
+        >
+          @if (isSubmitting) {
+            <span>جاري الإنشاء...</span>
+          } @else {
+            <span>إنشاء المطعم</span>
+          }
+        </button>
+      </form>
+    </div>
+
+    <!-- Created Restaurants List -->
+    @if (createdRestaurants.length > 0) {
+      <div class="restaurants-list">
+        <h2 class="list-title">المطاعم المُنشأة</h2>
+        
+        @for (restaurant of createdRestaurants; track restaurant.restaurantId) {
+          <div class="restaurant-card">
+            <div class="restaurant-info">
+              <h3 class="restaurant-name">{{ restaurant.restaurantName }}</h3>
+              <p class="restaurant-detail"><strong>المدير:</strong> {{ restaurant.adminName }}</p>
+              <p class="restaurant-detail"><strong>رقم الجوال:</strong> {{ restaurant.adminPhone }}</p>
+              @if (restaurant.logoUrl) {
+                <p class="restaurant-detail">✓ يحتوي على شعار</p>
+              }
+            </div>
+            <button
+              class="copy-btn"
+              (click)="copyCredentials(restaurant)"
+              title="نسخ بيانات الاعتماد"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/>
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              نسخ
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

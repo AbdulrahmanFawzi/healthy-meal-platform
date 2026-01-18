@@ -313,7 +313,53 @@
     margin: 32px auto 0;
     padding: 16px 0;
     
-    .next-meal-btn {
+    .action-buttons-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: stretch;
+    }
+    
+    // Subtle Secondary Back Button
+    .back-button {
+      height: 32px;
+      padding: 0 12px;
+      background: #FFFFFF;
+      color: #374151;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      font-family: $font-family-base;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 20px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      direction: rtl;
+      align-self: flex-start; // Position at right in RTL context
+      
+      .button-icon {
+        font-size: 16px;
+        line-height: 1;
+        // Arrow points right (→) in RTL context for "back"
+      }
+      
+      &:hover {
+        background: #F9FAFB;
+        border-color: #D1D5DB;
+      }
+      
+      &:active {
+        background: #F3F4F6;
+      }
+    }
+    
+    .next-meal-btn,
+    .snack-button,
+    .review-button {
       width: 100%;
       height: 36px;
       background: linear-gradient(135deg, #00C950 0%, #009966 100%);

@@ -38,10 +38,10 @@
     @if (!isSnackStep) {
       <div class="meal-category-section">
         <div class="section-title-card">
-          <div class="meal-number-badge">{{ currentMealIndex }}</div>
+          <div class="meal-number-badge">{{ currentMealIndex + 1 }}</div>
           <div class="title-content">
             <h2 class="section-title">اختر البروتين</h2>
-            <p class="section-subtitle">اختر وجبة البروتين للوجبة {{ currentMealIndex }}</p>
+            <p class="section-subtitle">اختر وجبة البروتين للوجبة {{ currentMealIndex + 1 }}</p>
           </div>
         </div>
       
@@ -83,10 +83,10 @@
     @if (selectedProtein && !isSnackStep) {
       <div class="meal-category-section">
         <div class="section-title-card">
-          <div class="meal-number-badge">{{ currentMealIndex }}</div>
+          <div class="meal-number-badge">{{ currentMealIndex + 1 }}</div>
           <div class="title-content">
             <h2 class="section-title">اختر الكربوهيدرات</h2>
-            <p class="section-subtitle">اختر وجبة الكارب للوجبة {{ currentMealIndex }}</p>
+            <p class="section-subtitle">اختر وجبة الكارب للوجبة {{ currentMealIndex + 1 }}</p>
           </div>
         </div>
         
@@ -124,7 +124,7 @@
       </div>
     }
     
-    <!-- STEP 3: Snack Selection (optional) -->
+    <!-- STEP 3: Snack Selection (optional, only if snackIncluded) -->
     @if (isSnackStep) {
       <div class="meal-category-section">
         <div class="section-title-card snack-header">
@@ -177,25 +177,39 @@
     
   </div>
   
-  <!-- Next Meal Button (shown after meal 1 is complete) -->
-  @if (showNextMealButton) {
+  <!-- Action Buttons (Dynamic based on step) -->
+  @if (showMealActionButtons) {
     <div class="bottom-action-bar">
-      <button class="next-meal-btn" (click)="proceedToMeal2()">
-        الانتقال إلى الوجبة التالية
-      </button>
-    </div>
-  }
-  
-  <!-- Meal 2 Action Buttons (shown after meal 2 is complete) -->
-  @if (showMeal2ActionButtons) {
-    <div class="meal2-action-buttons">
-      <button class="back-button" (click)="goBackToMeal1()">
-        <span class="button-icon">←</span>
-        رجوع للوجبة الأولى
-      </button>
-      <button class="snack-button" (click)="proceedToSnack()">
-        الانتقال للسناك
-      </button>
+      <div class="action-buttons-container">
+        <!-- Back Button -->
+        @if (canGoBack) {
+          <button class="back-button" (click)="goBackToPreviousMeal()">
+            <span class="button-icon">←</span>
+            رجوع
+          </button>
+        }
+        
+        <!-- Next Meal Button -->
+        @if (showNextMealButton) {
+          <button class="next-meal-btn" (click)="proceedToNextMeal()">
+            الانتقال إلى الوجبة التالية
+          </button>
+        }
+        
+        <!-- Snack Button (only if snack included) -->
+        @if (showSnackButton) {
+          <button class="snack-button" (click)="proceedToSnack()">
+            الانتقال للسناك
+          </button>
+        }
+        
+        <!-- Review Button (when snack not included and on last meal) -->
+        @if (showReviewButton) {
+          <button class="review-button" (click)="proceedToReview()">
+            مراجعة الطلب
+          </button>
+        }
+      </div>
     </div>
   }
 </div>

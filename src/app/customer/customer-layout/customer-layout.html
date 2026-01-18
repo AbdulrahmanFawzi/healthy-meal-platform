@@ -1,11 +1,22 @@
 <div class="customer-layout" dir="rtl">
   <!-- Sidebar (right side in RTL) -->
-  <app-customer-sidebar></app-customer-sidebar>
+  <app-customer-sidebar 
+    [isOpen]="isSidebarOpen"
+    (close)="closeSidebar()">
+  </app-customer-sidebar>
+
+  <!-- Backdrop (mobile only) -->
+  @if (isSidebarOpen) {
+    <div class="sidebar-backdrop" (click)="closeSidebar()"></div>
+  }
 
   <!-- Main Content Area -->
   <div class="customer-content">
     <!-- Header -->
-    <app-customer-header></app-customer-header>
+    <app-customer-header 
+      [isSidebarOpen]="isSidebarOpen"
+      (toggleSidebar)="toggleSidebar()">
+    </app-customer-header>
     
     <!-- Page Content (router-outlet for child routes) -->
     <main class="customer-main">

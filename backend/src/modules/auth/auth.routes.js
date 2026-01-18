@@ -101,6 +101,26 @@ router.post('/login', authController.login);
  * GET /api/auth/me
  * ============================================
  * 
+ * Purpose: Get current authenticated user's profile and restaurant data
+ * 
+ * Access: Protected (authentication required)
+ * 
+ * Response:
+ * {
+ *   "success": true,
+ *   "data": {
+ *     "user": { ... },
+ *     "restaurant": { ... }
+ *   }
+ * }
+ */
+router.get('/me', authMiddleware, authController.getCurrentUser);
+
+/**
+ * ============================================
+ * GET /api/auth/me
+ * ============================================
+ * 
  * Purpose: Get current user's profile
  * 
  * Access: Protected (requires valid JWT)

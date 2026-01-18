@@ -1,9 +1,16 @@
-<aside class="customer-sidebar" dir="rtl">
+<aside class="customer-sidebar" [class.open]="isOpen" dir="rtl">
   <!-- Logo Section -->
-  <div class="sidebar-logo">
-    <img [src]="restaurantLogoUrl" alt="Logo" class="logo-image">
-    <h2 class="brand-text">وجباتي</h2>
-  </div>
+  @if (branding$ | async; as branding) {
+    <div class="sidebar-logo">
+      <img [src]="brandingService.getLogoUrl(branding.logoUrl)" alt="Logo" class="logo-image">
+      <h2 class="brand-text">{{ branding.name }}</h2>
+    </div>
+  } @else {
+    <div class="sidebar-logo">
+      <img src="assets/healthyFoodIcon.png" alt="Logo" class="logo-image">
+      <h2 class="brand-text">وجباتي</h2>
+    </div>
+  }
 
   <!-- Navigation Menu -->
   <nav class="sidebar-nav">
@@ -12,7 +19,8 @@
         [routerLink]="item.route" 
         routerLinkActive="active"
         class="nav-item"
-        [class.active]="isActive(item.route)">
+        [class.active]="isActive(item.route)"
+        (click)="onNavItemClick()">
         <img [src]="item.icon" [alt]="item.label" class="nav-icon">
         <span class="nav-label">{{ item.label }}</span>
       </a>

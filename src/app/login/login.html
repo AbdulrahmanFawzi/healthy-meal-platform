@@ -28,14 +28,15 @@
         <div class="form-group">
           <label for="phone" class="form-label">رقم الجوال</label>
           <div class="input-wrapper">
-            <!-- Phone input - Saudi format +9665XXXXXXXX, LTR for number entry -->
+            <!-- Phone input - Saudi format 05XXXXXXXX, LTR for number entry -->
             <input
               id="phone"
               type="tel"
               formControlName="phone"
               class="form-input"
               [class.error]="phone?.invalid && phone?.touched"
-              placeholder="+9665XXXXXXXX"
+              placeholder="05XXXXXXXX"
+              maxlength="10"
               dir="ltr"
             />
             <!-- Phone icon -->
@@ -50,7 +51,7 @@
                 <span>رقم الجوال مطلوب</span>
               }
               @if (phone?.errors?.['pattern']) {
-                <span>رقم الجوال يجب أن يكون بصيغة +9665XXXXXXXX</span>
+                <span>رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام</span>
               }
             </div>
           }

@@ -14,6 +14,18 @@
   padding: 16px 0;
   overflow-y: auto;
   z-index: 50;
+  transition: transform 0.3s ease;
+
+  // Mobile: off-canvas behavior
+  @media (max-width: 768px) {
+    z-index: 50;
+    transform: translateX(100%); // Hidden by default (slide right in RTL)
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+
+    &.open {
+      transform: translateX(0); // Visible when open
+    }
+  }
 }
 
 .sidebar-logo {

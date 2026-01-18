@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { LoginRequest, LoginResponse, AuthState } from '../models/auth.model';
 import { User } from '../models/user.model';
 import { Restaurant } from '../models/restaurant.model';
+import { RestaurantBrandingService } from '../services/restaurant-branding.service';
 
 
 @Injectable({
@@ -22,7 +23,8 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private brandingService: RestaurantBrandingService
   ) {}
 
   /**
@@ -53,6 +55,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.AUTH_KEY);
     this.authState$.next(null);
+    this.brandingService.clearBranding();
     this.router.navigate(['/login']);
   }
 

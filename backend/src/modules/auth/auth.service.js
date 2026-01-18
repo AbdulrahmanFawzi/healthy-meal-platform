@@ -42,6 +42,7 @@
 const User = require('../../models/user.model');
 const Restaurant = require('../../models/restaurant.model');
 const { generateToken } = require('../../utils/jwt.util');
+const { normalizePhone } = require('../../utils/phone.util');
 
 /**
  * ============================================
@@ -105,11 +106,27 @@ const login = async ({ phone, password }) => {
     error.statusCode = 400;
     throw error;
   }
+
+  /**
+   * Step 1.5: Normalize Phone Number
+   * ---------------------------------
+   * Convert phone to international format for database lookup
+   * Supports both formats: 05XXXXXXXX and +9665XXXXXXXX
+   */
+  let normalizedPhone;
+  try {
+    normalizedPhone = normalizePhone(phone);
+  } catch (error) {
+    const err = new Error('صيغة رقم الجوال غير صحيحة');
+    err.code = 'VALIDATION_ERROR';
+    err.statusCode = 400;
+    throw err;
+  }
   
   /**
    * Step 2: Find User by Phone
    * ---------------------------
-   * Search for user with matching phone number.
+   * Search for user with matching phone number (normalized format).
    * 
    * MVP Simplification:
    * -------------------
@@ -127,7 +144,7 @@ const login = async ({ phone, password }) => {
    * Important: Use .select('+passwordHash') to include password field
    * (normally excluded by default for security).
    */
-  const user = await User.findOne({ phone }).select('+passwordHash');
+  const user = await User.findOne({ phone: normalizedPhone }).select('+passwordHash');
   
   /**
    * Security Note: Generic Error Message

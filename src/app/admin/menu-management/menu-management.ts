@@ -76,8 +76,12 @@ export class AdminMenuManagementComponent implements OnInit {
    * Open modal to add new meal
    */
   openAddMealModal(): void {
+    // Explicitly clear editing meal to ensure CREATE mode
     this.editingMeal = null;
-    this.isModalOpen = true;
+    // Small delay to ensure state is cleared before opening
+    setTimeout(() => {
+      this.isModalOpen = true;
+    }, 0);
   }
 
   /**
@@ -93,11 +97,9 @@ export class AdminMenuManagementComponent implements OnInit {
    */
   closeModal(): void {
     this.isModalOpen = false;
+    // Reset all modal-related state
     this.editingMeal = null;
-    // Give modal time to reset its internal state
-    setTimeout(() => {
-      // Reset any lingering state
-    }, 100);
+    this.isLoading = false;
   }
 
   /**
@@ -148,6 +150,13 @@ export class AdminMenuManagementComponent implements OnInit {
    * Update existing meal
    */
   private updateMeal(mealId: string, updates: any, imageFile: File | null): void {
+    // Validate meal ID exists
+    if (!mealId) {
+      console.error('[MenuManagement] Cannot update meal: missing ID');
+      this.toastService.error('خطأ: معرف الوجبة غير موجود');
+      return;
+    }
+
     // Prevent concurrent requests
     if (this.isLoading) {
       return;
@@ -157,6 +166,7 @@ export class AdminMenuManagementComponent implements OnInit {
 
     this.mealsService.updateMeal(mealId, updates).subscribe({
       next: (updatedMeal) => {
+        console.log('[MenuManagement] Meal updated successfully:', updatedMeal);
         // If new image was selected, upload it
         if (imageFile) {
           this.uploadMealImage(mealId, imageFile);
@@ -173,10 +183,11 @@ export class AdminMenuManagementComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Error updating meal:', err);
+        console.error('[MenuManagement] Error updating meal:', err);
         this.isLoading = false;
         this.closeModal();
-        this.toastService.error('فشل تحديث الوجبة. يرجى المحاولة مرة أخرى.');
+        const errorMsg = err?.error?.error?.message || 'فشل تحديث الوجبة. يرجى المحاولة مرة أخرى.';
+        this.toastService.error(errorMsg);
       }
     });
   }

@@ -21,18 +21,25 @@
   background: $bg-page;
 }
 
-// Mobile responsive
-@media (max-width: 768px) {
-  .admin-content {
-    margin-right: 240px;
+// Backdrop for mobile sidebar
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 40;
+  
+  @media (max-width: 768px) {
+    display: block;
   }
 }
 
-@media (max-width: 480px) {
+// Mobile responsive
+@media (max-width: 768px) {
   .admin-content {
-    margin-right: 0;
+    margin-right: 0; // Remove margin on mobile, sidebar is off-canvas
   }
-  
-  // On mobile, sidebar could be hidden or toggled
-  // For now, we keep it visible but could add toggle logic later
 }

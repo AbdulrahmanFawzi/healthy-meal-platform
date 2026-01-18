@@ -59,37 +59,96 @@ export class MealFormModalComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // Reinitialize form when meal input changes (switching between create/edit)
+    // Handle both meal changes AND isOpen changes
+    if (changes['isOpen'] && changes['isOpen'].currentValue === true) {
+      // Modal just opened
+      if (this.meal) {
+        // Edit mode - patch form with meal data
+        this.patchFormForEdit(this.meal);
+      } else {
+        // Create mode - reset to clean state
+        this.resetFormToDefaults();
+      }
+    }
+    
+    // Also handle meal input changes
     if (changes['meal'] && !changes['meal'].firstChange) {
-      this.initForm();
+      if (this.meal) {
+        this.patchFormForEdit(this.meal);
+      } else {
+        this.resetFormToDefaults();
+      }
     }
   }
 
   /**
-   * Initialize form with validators
-   * Pre-fill if editing existing meal
+   * Initialize form structure (called once in ngOnInit)
    */
   private initForm(): void {
     this.mealForm = this.fb.group({
-      name: [this.meal?.name || '', [Validators.required, Validators.minLength(3)]],
-      description: [this.meal?.description || '', [Validators.required, Validators.minLength(10)]],
-      category: [this.meal?.category || MealCategory.PROTEIN, Validators.required],
-      calories: [this.meal?.calories || null, [Validators.required, Validators.min(1)]],
-      proteinGrams: [this.meal?.proteinGrams || null, [Validators.required, Validators.min(0)]],
-      carbsGrams: [this.meal?.carbsGrams || null, [Validators.required, Validators.min(0)]],
-      availability: [this.meal?.availability || MealAvailability.DAILY, Validators.required],
-      isActive: [this.meal?.isActive ?? true]
+      name: ['', [Validators.required, Validators.minLength(3)]],
+      description: ['', [Validators.required, Validators.minLength(2)]],
+      category: [MealCategory.PROTEIN, Validators.required],
+      calories: [null, [Validators.required, Validators.min(1)]],
+      proteinGrams: [null, [Validators.required, Validators.min(0)]],
+      carbsGrams: [null, [Validators.required, Validators.min(0)]],
+      availability: [MealAvailability.DAILY, Validators.required],
+      isActive: [true]
+    });
+  }
+
+  /**
+   * Reset form to default empty state (CREATE mode)
+   */
+  private resetFormToDefaults(): void {
+    this.mealForm.reset({
+      name: '',
+      description: '',
+      category: MealCategory.PROTEIN,
+      calories: null,
+      proteinGrams: null,
+      carbsGrams: null,
+      availability: MealAvailability.DAILY,
+      isActive: true
     });
 
-    // Reset image state
+    // Reset all UI states
+    this.imagePreview = null;
     this.selectedImageFile = null;
-    
-    // If editing, set image preview from existing meal (convert to full URL)
-    if (this.meal?.imageUrl) {
-      this.imagePreview = this.mealsService.getImageUrl(this.meal.imageUrl);
-    } else {
-      this.imagePreview = null;
+    this.isSubmitting = false;
+    this.isCategoryDropdownOpen = false;
+    this.isAvailabilityDropdownOpen = false;
+
+    // Clear file input
+    const fileInput = document.getElementById('mealImageInput') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
     }
+  }
+
+  /**
+   * Patch form with existing meal data (EDIT mode)
+   */
+  private patchFormForEdit(meal: Meal): void {
+    this.mealForm.patchValue({
+      name: meal.name,
+      description: meal.description,
+      category: meal.category,
+      calories: meal.calories,
+      proteinGrams: meal.proteinGrams,
+      carbsGrams: meal.carbsGrams,
+      availability: meal.availability,
+      isActive: meal.isActive
+    });
+
+    // Set image preview from existing meal
+    this.imagePreview = meal.imageUrl ? this.mealsService.getImageUrl(meal.imageUrl) : null;
+    this.selectedImageFile = null;
+
+    // Reset submission state
+    this.isSubmitting = false;
+    this.isCategoryDropdownOpen = false;
+    this.isAvailabilityDropdownOpen = false;
 
     // Clear file input
     const fileInput = document.getElementById('mealImageInput') as HTMLInputElement;
@@ -184,30 +243,12 @@ export class MealFormModalComponent implements OnInit, OnChanges {
   }
 
   /**
-   * Close modal
+   * Close modal and reset state
    */
   onClose(): void {
-    if (!this.isSubmitting) {
-      this.close.emit();
-      this.resetForm();
-    } else {
-      // If closing while submitting, just reset state
-      this.isSubmitting = false;
-    }
-  }
-
-  /**
-   * Reset form and image
-   */
-  private resetForm(): void {
-    this.isSubmitting = false;
-    this.mealForm.reset({
-      category: MealCategory.PROTEIN,
-      availability: MealAvailability.DAILY,
-      isActive: true
-    });
-    this.imagePreview = null;
-    this.selectedImageFile = null;
+    // Always allow closing (even if submitting)
+    this.resetFormToDefaults();
+    this.close.emit();
   }
 
   /**
